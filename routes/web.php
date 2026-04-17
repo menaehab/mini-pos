@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -27,7 +28,7 @@ Route::middleware('auth')->group(function () {
         'destroy' => 'can:manage_suppliers',
     ]);
 
-    // customer management
+    // customers management
     Route::resource('customers', CustomerController::class)->middleware([
         'index' => 'can:view_customers|manage_customers',
         'create' => 'can:manage_customers',
@@ -36,6 +37,17 @@ Route::middleware('auth')->group(function () {
         'edit' => 'can:manage_customers',
         'update' => 'can:manage_customers',
         'destroy' => 'can:manage_customers',
+    ]);
+
+    // categories management
+    Route::resource('categories', CategoryController::class)->middleware([
+        'index' => 'can:view_categories|manage_categories',
+        'create' => 'can:manage_categories',
+        'store' => 'can:manage_categories',
+        'show' => 'can:view_categories|manage_categories',
+        'edit' => 'can:manage_categories',
+        'update' => 'can:manage_categories',
+        'destroy' => 'can:manage_categories',
     ]);
 });
 
