@@ -1,16 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+Route::middleware('auth')->group(function () {
+    // user management
+    Route::resource('users', UserController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';
