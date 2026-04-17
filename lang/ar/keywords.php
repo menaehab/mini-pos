@@ -12,4 +12,6 @@ return [
     'customers' => 'العملاء',
     'category' => 'الفئة',
     'categories' => 'الفئات',
+    'product' => 'المنتج',
+    'products' => 'المنتجات',
 ];
