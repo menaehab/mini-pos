@@ -49,14 +49,14 @@ class CategoryController extends Controller
     {
         $category->loadCount('items');
 
-        return Inertia::render('categories/show', [
+        return Inertia::render('Categories/Show', [
             'category' => $category,
         ]);
     }
 
     public function edit(Category $category)
     {
-        return Inertia::render('categories/edit', [
+        return Inertia::render('Categories/Edit', [
             'category' => $category,
         ]);
     }
