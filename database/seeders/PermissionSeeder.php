@@ -15,6 +15,8 @@ class PermissionSeeder extends Seeder
         $permissions = [
             'manage_users',
             'view_users',
+            'manage_suppliers',
+            'view_suppliers',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
