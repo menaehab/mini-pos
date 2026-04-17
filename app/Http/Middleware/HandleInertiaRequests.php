@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use LaravelLangSyncInertia\Lang;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -29,11 +30,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        // Lang::getFile(['auth','actions','pagination','validation','keywords']);
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
             ],
+            'locale' => app()->getLocale(),
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
+            'user_permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? [],
+
         ];
     }
 }
