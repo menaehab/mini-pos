@@ -36,4 +36,10 @@ return [
     'success' => 'نجاح',
     'warning' => 'تحذير',
     'info' => 'معلومات',
+    'supplier' => 'المورد',
+    'suppliers' => 'الموردين',
+    'customer' => 'العميل',
+    'customers' => 'العملاء',
+    'category' => 'الفئة',
+    'categories' => 'الفئات',
 ];
