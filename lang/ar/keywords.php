@@ -8,4 +8,6 @@ return [
     'users' => 'المستخدمين',
     'supplier' => 'المورد',
     'suppliers' => 'الموردين',
+    'customer' => 'العميل',
+    'customers' => 'العملاء',
 ];
