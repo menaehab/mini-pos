@@ -13,7 +13,8 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-
+            'manage_users',
+            'view_users',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
