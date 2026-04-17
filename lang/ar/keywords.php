@@ -10,4 +10,6 @@ return [
     'suppliers' => 'الموردين',
     'customer' => 'العميل',
     'customers' => 'العملاء',
+    'category' => 'الفئة',
+    'categories' => 'الفئات',
 ];
