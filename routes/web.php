@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,17 @@ Route::middleware('auth')->group(function () {
         'edit' => 'can:manage_categories',
         'update' => 'can:manage_categories',
         'destroy' => 'can:manage_categories',
+    ]);
+
+    // products management
+    Route::resource('products', ProductController::class)->middleware([
+        'index' => 'can:view_products|manage_products',
+        'create' => 'can:manage_products',
+        'store' => 'can:manage_products',
+        'show' => 'can:view_products|manage_products',
+        'edit' => 'can:manage_products',
+        'update' => 'can:manage_products',
+        'destroy' => 'can:manage_products',
     ]);
 });
 
