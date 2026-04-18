@@ -27,6 +27,7 @@ class SearchPurchaseRequest extends FormRequest
             'search' => ['nullable', 'string', 'max:255'],
             'supplier_id' => ['nullable', 'exists:suppliers,id'],
             'payment_type' => ['nullable', 'in'.implode(',', PurchaseTypeEnum::values())],
+            'per_page' => ['nullable', 'integer', 'in:10,25,50,100'],
         ];
     }
 }
