@@ -1,9 +1,6 @@
-import MainLayout from "../Layouts/MainLayout";
-import Index from "./Users/Index";
+import MainLayout from '../Layouts/MainLayout';
 
 export default function index() {
-    return <div>
-        <Index/>
-    </div>;
+    return <div></div>;
 }
 index.layout = (page) => <MainLayout children={page} />;
