@@ -63,4 +63,7 @@ Route::middleware('auth')->group(function () {
     ]);
 });
 
+Route::get('/', function () {
+    return inertia('index');
+})->name('home');
 require __DIR__.'/auth.php';
