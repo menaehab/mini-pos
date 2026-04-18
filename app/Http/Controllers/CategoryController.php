@@ -22,7 +22,7 @@ class CategoryController extends Controller
             ->paginate($data['per_page'] ?? 10)
             ->withQueryString();
 
-        return Inertia::render('Categories/Index', [
+        return Inertia::render('categories/Index', [
             'categories' => $categories,
             'filters' => [
                 'search' => $data['search'] ?? null,
@@ -33,7 +33,7 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return Inertia::render('Categories/Create');
+        return Inertia::render('categories/Create');
     }
 
     public function store(StoreCategoryRequest $request)
@@ -49,14 +49,14 @@ class CategoryController extends Controller
     {
         $category->loadCount('items');
 
-        return Inertia::render('Categories/Show', [
+        return Inertia::render('categories/Show', [
             'category' => $category,
         ]);
     }
 
     public function edit(Category $category)
     {
-        return Inertia::render('Categories/Edit', [
+        return Inertia::render('categories/Edit', [
             'category' => $category,
         ]);
     }
