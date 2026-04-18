@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Purchases\SearchPurchaseRequest;
 use App\Http\Requests\Purchases\StorePurchaseRequest;
 use App\Models\Purchase;
+use App\Models\SupplierPayment;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
@@ -48,7 +49,37 @@ class PurchaseController extends Controller
      */
     public function store(StorePurchaseRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        $data['user_id'] = auth()->id();
+
+        $purchase = Purchase::create($data);
+
+        $payment = SupplierPayment::create([
+            'supplier_id' => $data['supplier_id'],
+            'amount' => $data['amount'],
+        ]);
+
+        $purchase->supplierPaymentAllocations()->create([
+            'supplier_payment_id' => $payment->id,
+            'amount' => $data['amount'],
+        ]);
+        $total = 0;
+        foreach ($data['items'] as $item) {
+            $total += $item['quantity'] * $item['purchase_price'];
+            $purchase->items()->create([
+                'item_id' => $item['item_id'],
+                'quantity' => $item['quantity'],
+                'purchase_price' => $item['purchase_price'],
+            ]);
+        }
+
+        $purchase->update([
+            'total_price' => $total,
+        ]);
+
+        return redirect()->route('purchases.index', $purchase)
+            ->with('success', __('keywords.created', ['name' => __('keywords.purchase')])));
     }
 
     /**
@@ -80,7 +111,7 @@ class PurchaseController extends Controller
      */
     public function update(Request $request, Purchase $purchase)
     {
-        //
+        $purchase->load('supplier', 'items');
     }
 
     /**

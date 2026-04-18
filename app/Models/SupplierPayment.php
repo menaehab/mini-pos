@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
     'amount',
     'note',
     'supplier_id',
+    'user_id',
 ])]
 class SupplierPayment extends Model
 {
