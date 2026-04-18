@@ -4,8 +4,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite",
-        "lint": "eslint resources/js --ext .js,.jsx --ignore-path .gitignore --ignore-pattern resources/js/app.jsx --ignore-pattern resources/js/Pages/** --ignore-pattern resources/js/Layouts/** --ignore-pattern resources/js/**/*inertia* --fix"
+        "dev": "vite"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
@@ -15,11 +14,6 @@
         "@vitejs/plugin-react": "^5.2.0",
         "autoprefixer": "^10.4.12",
         "concurrently": "^9.0.1",
-        "eslint": "^8.57.0",
-        "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-prettier": "^5.1.3",
-        "eslint-plugin-react": "^7.34.4",
-        "eslint-plugin-react-hooks": "^4.6.2",
         "laravel-vite-plugin": "^3.0.0",
         "postcss": "^8.4.31",
         "prettier": "^3.3.0",
@@ -31,6 +25,7 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
-        "@erag/lang-sync-inertia": "^1.6.1"
+        "@erag/lang-sync-inertia": "^1.6.1",
+        "lucide-react": "^1.8.0"
     }
 }

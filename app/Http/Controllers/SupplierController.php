@@ -46,7 +46,7 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier)
     {
-        return inertia('Suppliers/show', [
+        return inertia('Suppliers/Show', [
             'supplier' => $supplier,
         ]);
     }

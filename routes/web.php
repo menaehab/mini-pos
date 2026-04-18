@@ -2,68 +2,66 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
-    // user management
-    Route::resource('users', UserController::class)->except(['show'])->middleware([
-        'index' => 'can:view_users|manage_users',
-        'create' => 'can:manage_users',
-        'store' => 'can:manage_users',
-        'edit' => 'can:manage_users',
-        'update' => 'can:manage_users',
-        'destroy' => 'can:manage_users',
-    ]);
 
-    // supplier management
-    Route::resource('suppliers', SupplierController::class)->middleware([
-        'index' => 'can:view_suppliers|manage_suppliers',
-        'create' => 'can:manage_suppliers',
-        'store' => 'can:manage_suppliers',
-        'show' => 'can:view_suppliers',
-        'edit' => 'can:manage_suppliers',
-        'update' => 'can:manage_suppliers',
-        'destroy' => 'can:manage_suppliers',
-    ]);
+    Route::get('users', [UserController::class, 'index'])
+        ->middleware('permission:view_users|manage_users');
 
-    // customers management
-    Route::resource('customers', CustomerController::class)->middleware([
-        'index' => 'can:view_customers|manage_customers',
-        'create' => 'can:manage_customers',
-        'store' => 'can:manage_customers',
-        'show' => 'can:view_customers|manage_customers',
-        'edit' => 'can:manage_customers',
-        'update' => 'can:manage_customers',
-        'destroy' => 'can:manage_customers',
-    ]);
+    Route::resource('users', UserController::class)
+        ->except(['index', 'show'])
+        ->middleware('permission:manage_users');
 
-    // categories management
-    Route::resource('categories', CategoryController::class)->middleware([
-        'index' => 'can:view_categories|manage_categories',
-        'create' => 'can:manage_categories',
-        'store' => 'can:manage_categories',
-        'show' => 'can:view_categories|manage_categories',
-        'edit' => 'can:manage_categories',
-        'update' => 'can:manage_categories',
-        'destroy' => 'can:manage_categories',
-    ]);
+    // suppliers
+    Route::get('suppliers', [SupplierController::class, 'index'])
+        ->middleware('permission:view_suppliers|manage_suppliers');
 
-    // products management
-    Route::resource('products', ProductController::class)->middleware([
-        'index' => 'can:view_products|manage_products',
-        'create' => 'can:manage_products',
-        'store' => 'can:manage_products',
-        'show' => 'can:view_products|manage_products',
-        'edit' => 'can:manage_products',
-        'update' => 'can:manage_products',
-        'destroy' => 'can:manage_products',
-    ]);
+    Route::resource('suppliers', SupplierController::class)
+        ->except(['index'])
+        ->middleware('permission:manage_suppliers');
+
+    Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])
+        ->middleware('permission:view_suppliers');
+
+    // customers
+    Route::get('customers', [CustomerController::class, 'index'])
+        ->middleware('permission:view_customers|manage_customers');
+
+    Route::resource('customers', CustomerController::class)
+        ->except(['index', 'show'])
+        ->middleware('permission:manage_customers');
+
+    Route::get('customers/{customer}', [CustomerController::class, 'show'])
+        ->middleware('permission:view_customers|manage_customers');
+
+    // categories
+    Route::get('categories', [CategoryController::class, 'index'])
+        ->middleware('permission:view_categories|manage_categories');
+
+    Route::resource('categories', CategoryController::class)
+        ->except(['index', 'show'])
+        ->middleware('permission:manage_categories');
+
+    Route::get('categories/{category}', [CategoryController::class, 'show'])
+        ->middleware('permission:view_categories|manage_categories');
+
+    // products
+    Route::get('products', [ProductController::class, 'index'])
+        ->middleware('permission:view_products|manage_products');
+
+    Route::resource('products', ProductController::class)
+        ->except(['index', 'show'])
+        ->middleware('permission:manage_products');
+
+    Route::get('products/{product}', [ProductController::class, 'show'])
+        ->middleware('permission:view_products|manage_products');
+
+    Route::get('/', [HomeController::class, 'index'])->name('home');
 });
 
-Route::get('/', function () {
-    return inertia('index');
-})->name('home');
 require __DIR__.'/auth.php';
