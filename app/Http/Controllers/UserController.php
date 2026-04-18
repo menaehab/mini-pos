@@ -27,21 +27,13 @@ class UserController extends Controller
             ->paginate($data['per_page'] ?? 10)
             ->withQueryString();
 
+        $permissions = Permission::all();
+
         return inertia('Users/Index', [
             'users' => $users,
             'filters' => $data,
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $permissions = Permission::all();
-
-        return inertia('Users/Create', [
             'permissions' => $permissions,
+
         ]);
     }
 
@@ -62,29 +54,6 @@ class UserController extends Controller
         $user->syncPermissions($data['permissions'] ?? []);
 
         return redirect()->route('users.index')->with('success', __('keywords.created', ['name' => __('keywords.user')]));
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    // public function show(User $user)
-    // {
-    //     return inertia('Users/show', [
-    //         'user' => $user->load('permissions'),
-    //     ]);
-    // }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        $permissions = Permission::all();
-
-        return inertia('Users/Edit', [
-            'user' => $user->load('permissions'),
-            'permissions' => $permissions,
-        ]);
     }
 
     /**
