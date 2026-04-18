@@ -18,6 +18,7 @@ class UserController extends Controller
         $data = $request->validated();
 
         $users = User::query()
+            ->with('permissions:name')
             ->when($data['search'] ?? null, function ($query) use ($data) {
                 $query->where('name', 'like', "%{$data['search']}%")
                     ->orWhere('email', 'like', "%{$data['search']}%")
@@ -27,13 +28,12 @@ class UserController extends Controller
             ->paginate($data['per_page'] ?? 10)
             ->withQueryString();
 
-        $permissions = Permission::all();
+        $permissions = Permission::pluck('name');
 
         return inertia('Users/Index', [
             'users' => $users,
             'filters' => $data,
             'permissions' => $permissions,
-
         ]);
     }
 
