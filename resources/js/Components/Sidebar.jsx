@@ -1,4 +1,5 @@
-﻿import { Link } from '@inertiajs/react';
+﻿import { usePermissions } from '@/hooks/usePermissions';
+import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 const ICONS_PATH = '/Solve X';
@@ -10,69 +11,34 @@ const menuItems = [
         route: 'home',
     },
     {
-        name: 'المبيعات',
-        icon: `${ICONS_PATH}/icon-park-outline_sales-report.svg`,
-        route: 'sales',
-    },
-    {
-        name: 'مرتجع المبيعات',
-        icon: `${ICONS_PATH}/lsicon_sales-return-outline.svg`,
-        route: 'sales.returns',
-    },
-    {
-        name: 'إذن التوريد',
-        icon: `${ICONS_PATH}/ion_receipt-outline.svg`,
-        route: 'supply.orders',
-    },
-    {
-        name: 'المشتريات',
-        icon: `${ICONS_PATH}/tdesign_money.svg`,
-        route: 'purchases',
-    },
-    {
-        name: 'مرتجع المشتريات',
-        icon: `${ICONS_PATH}/game-icons_back-forth.svg`,
-        route: 'purchases.returns',
-    },
-    {
-        name: 'إذن الصرف',
-        icon: `${ICONS_PATH}/ion_receipt-outline.svg`,
-        route: 'exchange.orders',
-    },
-    {
         name: 'الأقسام',
         icon: `${ICONS_PATH}/qlementine-icons_items-list-16.svg`,
-        route: 'departments',
+        route: 'categories.index',
+        requiredPermissions: ['view_categories', 'manage_categories'],
     },
     {
         name: 'المنتجات',
         icon: `${ICONS_PATH}/qlementine-icons_items-list-16.svg`,
-        route: 'products',
-    },
-    {
-        name: 'المصروفات',
-        icon: `${ICONS_PATH}/streamline_payment-10.svg`,
-        route: 'expenses',
-    },
-    {
-        name: 'الإحصائيات',
-        icon: `${ICONS_PATH}/icon-park-outline_sales-report.svg`,
-        route: 'statistics',
+        route: 'products.index',
+        requiredPermissions: ['view_products', 'manage_products'],
     },
     {
         name: 'الموردين',
         icon: `${ICONS_PATH}/oui_users.svg`,
-        route: 'suppliers',
+        route: 'suppliers.index',
+        requiredPermissions: ['view_suppliers', 'manage_suppliers'],
     },
     {
         name: 'العملاء',
         icon: `${ICONS_PATH}/solar_user-outline.svg`,
-        route: 'customers',
+        route: 'customers.index',
+        requiredPermissions: ['view_customers', 'manage_customers'],
     },
 ];
 
 export default function Sidebar({ isOpen, onClose = () => {} }) {
     const [isExpanded, setIsExpanded] = useState(true);
+    const { canAny } = usePermissions();
 
     const getSafeRoute = (routeName) => {
         try {
@@ -86,6 +52,16 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
         onClose();
     };
 
+    const visibleMenuItems = menuItems.filter((item) => {
+        if (!item.requiredPermissions) {
+            return true;
+        }
+
+        return canAny(item.requiredPermissions);
+    });
+
+    const canAccessUsers = canAny(['view_users', 'manage_users']);
+
     return (
         <aside
             className={`fixed right-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 shrink-0 flex-col border-l border-gray-100 bg-gray-200 font-['Cairo'] shadow-xl transition-all duration-300 md:relative md:top-0 md:h-full md:translate-x-0 md:shadow-none ${
@@ -97,7 +73,7 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
                 className={`absolute top-8 z-20 hidden h-7 w-7 items-center justify-center rounded-full bg-black text-white shadow transition-all duration-300 hover:bg-gray-800 md:flex ${
                     isExpanded
                         ? 'left-10 top-4 -translate-x-1/2'
-                        : 'left-[40px] top-[5px]'
+                        : 'left-[30px] top-[10px]'
                 }`}
                 aria-label="Toggle Sidebar"
                 type="button"
@@ -119,7 +95,7 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
             </button>
 
             <nav className="mt-6 flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-1 py-6">
-                {menuItems.map((item) => (
+                {visibleMenuItems.map((item) => (
                     <Link
                         key={item.name}
                         href={getSafeRoute(item.route)}
@@ -154,31 +130,33 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
                     isExpanded ? 'items-stretch' : 'items-center'
                 }`}
             >
-                <Link
-                    href={getSafeRoute('users.index')}
-                    onClick={handleItemClick}
-                    className={`flex items-center bg-black text-white transition-colors hover:bg-gray-800 ${
-                        isExpanded
-                            ? 'w-full justify-start gap-4 rounded-lg px-4 py-2.5'
-                            : 'h-[48px] w-[48px] justify-center rounded-full p-3'
-                    }`}
-                    title={!isExpanded ? 'المستخدمين' : undefined}
-                >
-                    <img
-                        src={`${ICONS_PATH}/oui_users.svg`}
-                        alt="المستخدمين"
-                        className="h-[20px] w-[20px] flex-shrink-0 object-contain invert filter"
-                    />
-                    <span
-                        className={`overflow-hidden whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+                {canAccessUsers && (
+                    <Link
+                        href={getSafeRoute('users.index')}
+                        onClick={handleItemClick}
+                        className={`flex items-center bg-black text-white transition-colors hover:bg-gray-800 ${
                             isExpanded
-                                ? 'w-auto opacity-100'
-                                : 'hidden w-0 opacity-0'
+                                ? 'w-full justify-start gap-4 rounded-lg px-4 py-2.5'
+                                : 'h-[48px] w-[48px] justify-center rounded-full p-3'
                         }`}
+                        title={!isExpanded ? 'المستخدمين' : undefined}
                     >
-                        المستخدمين
-                    </span>
-                </Link>
+                        <img
+                            src={`${ICONS_PATH}/oui_users.svg`}
+                            alt="المستخدمين"
+                            className="h-[20px] w-[20px] flex-shrink-0 object-contain invert filter"
+                        />
+                        <span
+                            className={`overflow-hidden whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+                                isExpanded
+                                    ? 'w-auto opacity-100'
+                                    : 'hidden w-0 opacity-0'
+                            }`}
+                        >
+                            المستخدمين
+                        </span>
+                    </Link>
+                )}
 
                 <Link
                     href={getSafeRoute('logout')}
