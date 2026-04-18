@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2)->default(0);
             $table->string('supplier_name');
             $table->string('payment_type');
+            $table->text('note')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->nullOnDelete();
             $table->timestamps();
