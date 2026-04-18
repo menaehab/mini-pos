@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Purchases\SearchPurchaseRequest;
+use App\Http\Requests\Purchases\StorePurchaseRequest;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 
@@ -39,13 +40,13 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('Purchases/Create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePurchaseRequest $request)
     {
         //
     }
@@ -55,7 +56,11 @@ class PurchaseController extends Controller
      */
     public function show(Purchase $purchase)
     {
-        //
+        $purchase->load('supplier', 'items');
+
+        return inertia('Purchases/Show', [
+            'purchase' => $purchase,
+        ]);
     }
 
     /**
@@ -63,7 +68,11 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        //
+        $purchase->load('supplier', 'items');
+
+        return inertia('Purchases/Edit', [
+            'purchase' => $purchase,
+        ]);
     }
 
     /**
