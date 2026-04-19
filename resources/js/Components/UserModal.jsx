@@ -57,7 +57,7 @@ export default function UserModal({ isOpen, onClose, user = null, permissions = 
         let currentErrors = {};
 
         if (!data.name.trim()) currentErrors.name = 'الاسم مطلوب';
-        if (!data.role.trim()) currentErrors.role = 'الدور مطلوب';
+        if (!isEditing && !data.role.trim()) currentErrors.role = 'الدور مطلوب';
         if (!data.email.trim()) currentErrors.email = 'البريد الالكتروني مطلوب';
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) currentErrors.email = 'صيغة البريد الالكتروني غير صحيحة';
 
@@ -134,7 +134,7 @@ export default function UserModal({ isOpen, onClose, user = null, permissions = 
                 {step === 1 && (
                     <form onSubmit={handleNextStep}>
                         <FormInput label="اسم" placeholder="مثال: مينا ايهاب" value={data.name} onChange={e => setData('name', e.target.value)} error={errors.name} />
-                        <FormInput label="الدور" placeholder="مثال: ادمن" value={data.role} onChange={e => setData('role', e.target.value)} error={errors.role} />
+                        <FormInput label="الدور" placeholder="مثال: ادمن" required={!isEditing} value={data.role} onChange={e => setData('role', e.target.value)} error={errors.role} />
                         <FormInput label="البريد الالكتروني" placeholder="test@test.com" type="email" value={data.email} onChange={e => setData('email', e.target.value)} error={errors.email} />
                         
                         <FormInput label="كلمة المرور" placeholder={isEditing ? "اتركه فارغاً إذا لم ترد تغييره" : "*************"} type="password" required={!isEditing} value={data.password} onChange={e => setData('password', e.target.value)} error={errors.password} />

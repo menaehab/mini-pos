@@ -1,41 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import Table from '@/Components/Table';
 import Button from '@/Components/Button';
-import UserModal from '@/Components/UserModal'; 
+import UserModal from '@/Components/UserModal';
+import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
 import { Search } from 'lucide-react';
 import { Head, router } from '@inertiajs/react';
 
-export default function Index({ users = {}, filters = {} , permissions = [] }) { 
+export default function Index({ users = {}, filters = {} , permissions = [] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     
     const [selectedUser, setSelectedUser] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [deleteProcessing, setDeleteProcessing] = useState(false);
 
+    const isFirstRender = useRef(true);
    
     useEffect(() => {
+       
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
         const delaySearch = setTimeout(() => {
             router.get(route('users.index'), 
                 { search: searchQuery }, 
-                { preserveState: true, preserveScroll: true, replace: true }
+                { 
+                    preserveState: true, 
+                    preserveScroll: true, 
+                    replace: true 
+                }
             );
         }, 400);
+
         return () => clearTimeout(delaySearch);
     }, [searchQuery]);
 
     
     const handleDelete = (user) => {
-       
-        if (confirm(`هل أنت متأكد من حذف المستخدم "${user.name}"؟`)) {
-        
-            router.delete(route('users.destroy', user.id), {
-                preserveScroll: true,
-                onSuccess: () => {
-                   
-                    console.log('تم الحذف بنجاح');
-                }
-            });
-        }
+        setUserToDelete(user);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        setDeleteProcessing(true);
+        router.delete(route('users.destroy', userToDelete.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteModalOpen(false);
+                setUserToDelete(null);
+                setDeleteProcessing(false);
+            },
+            onError: () => setDeleteProcessing(false),
+        });
     };
 
   
@@ -106,6 +126,14 @@ export default function Index({ users = {}, filters = {} , permissions = [] }) {
                 onClose={() => setIsModalOpen(false)} 
                 user={selectedUser} 
                 permissions={permissions}
+            />
+
+            <DeleteConfirmModal
+                isOpen={deleteModalOpen}
+                onClose={() => { setDeleteModalOpen(false); setUserToDelete(null); }}
+                onConfirm={confirmDelete}
+                userName={userToDelete?.name}
+                processing={deleteProcessing}
             />
         </>
     );

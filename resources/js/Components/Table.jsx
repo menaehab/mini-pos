@@ -5,7 +5,7 @@ export default function Table({ columns, data, onEdit, onDelete }) {
     return (
         <div className="w-full overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-100">
             <table className="w-full text-sm text-right">
-                <thead className="text-white bg-[#1b2b20]">
+                <thead className="text-white bg-[#000000]">
                     <tr>
                         {columns.map((col, index) => (
                             <th key={index} className="px-6 py-4 font-medium">{col.header}</th>

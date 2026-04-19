@@ -13,30 +13,32 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(SearchUserRequest $request)
-    {
-        $data = $request->validated();
+  public function index(SearchUserRequest $request)
+{
+    $data = $request->validated();
 
-        $users = User::query()
-            ->with('permissions:name')
-            ->when($data['search'] ?? null, function ($query) use ($data) {
-                $query->where('name', 'like', "%{$data['search']}%")
-                    ->orWhere('email', 'like', "%{$data['search']}%")
-                    ->orWhere('phone', 'like', "%{$data['search']}%");
-            })
-            ->latest()
-            ->paginate($data['per_page'] ?? 10)
-            ->withQueryString();
+    $users = User::query()
+        ->with('permissions:name')
+        ->when($data['search'] ?? null, function ($query, $search) {
+            // تجميع شروط البحث في قوسين داخل الكويري
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        })
+        ->latest()
+        ->paginate($data['per_page'] ?? 10)
+        ->withQueryString();
 
-        $permissions = Permission::pluck('name');
+    $permissions = Permission::pluck('name');
 
-        return inertia('Users/Index', [
-            'users' => $users,
-            'filters' => $data,
-            'permissions' => $permissions,
-        ]);
-    }
-
+    return inertia('Users/Index', [
+        'users' => $users,
+        'filters' => $data,
+        'permissions' => $permissions,
+    ]);
+}
     /**
      * Store a newly created resource in storage.
      */
