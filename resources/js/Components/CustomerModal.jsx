@@ -22,7 +22,7 @@ const FormInput = ({ label, placeholder, type = "text", required = false, value,
 export default function CustomerModal({ isOpen, onClose, customer = null }) {
     const isEditing = !!customer;
 
-    // تم تعديل national_id إلى national_number لتطابق الباك اند
+
     const { data, setData, post, put, processing, errors, reset, clearErrors, setError } = useForm({
         name: '',
         phone: '',
@@ -52,7 +52,7 @@ export default function CustomerModal({ isOpen, onClose, customer = null }) {
         e.preventDefault();
         clearErrors();
 
-        // فحص سريع (الاسم فقط هو الإجباري بناء على الكنترولر بتاعك)
+
         if (!data.name.trim()) {
             setError('name', 'اسم العميل مطلوب');
             return;
@@ -84,7 +84,7 @@ export default function CustomerModal({ isOpen, onClose, customer = null }) {
                 </h2>
 
                 <form onSubmit={handleSubmit}>
-                    {/* الاسم فقط required */}
+                    
                     <FormInput label="الاسم" placeholder="مثال: مينا ايهاب" required={true} value={data.name} onChange={e => setData('name', e.target.value)} error={errors.name} />
                     <FormInput label="رقم التليفون" placeholder="مثال: 0123456789" value={data.phone} onChange={e => setData('phone', e.target.value)} error={errors.phone} />
                     <FormInput label="الرقم القومي" placeholder="مثال: 350101272419" value={data.national_number} onChange={e => setData('national_number', e.target.value)} error={errors.national_number} />
