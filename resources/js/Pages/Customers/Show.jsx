@@ -1,7 +1,4 @@
-import React from 'react'
 //!SECTION data: customer{id, name, phone, address, national_number}
 export default function Show({ customer }) {
-  return (
-    <div>Show</div>
-  )
+    return <div>Show</div>;
 }

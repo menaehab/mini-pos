@@ -3,11 +3,13 @@ import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
 import Table from '@/Components/Table';
 import UserModal from '@/Components/UserModal';
 import MainLayout from '@/Layouts/MainLayout';
+import useTranslation from '@/hooks/useTranslation';
 import { Head, router } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Index({ users = {}, filters = {}, permissions = [] }) {
+    const { __ } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(filters.per_page || '10');
@@ -69,19 +71,19 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
     };
 
     const columns = [
-        { header: 'الاسم', accessor: 'name' },
-        { header: 'الدور', accessor: 'role' },
-        { header: 'البريد الالكتروني', accessor: 'email' },
+        { header: __('keywords.name'), accessor: 'name' },
+        { header: __('keywords.role'), accessor: 'role' },
+        { header: __('keywords.email_address'), accessor: 'email' },
     ];
 
     return (
         <>
-            <Head title="المستخدمين" />
+            <Head title={__('keywords.users')} />
 
             <div className="relative mx-auto max-w-6xl">
                 <div className="mb-8 flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-800">
-                        المستخدمين
+                        {__('keywords.users')}
                     </h1>
                 </div>
 
@@ -92,7 +94,7 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
                                 <div className="relative w-72">
                                     <input
                                         type="text"
-                                        placeholder="بحث"
+                                        placeholder={__('keywords.search')}
                                         value={searchQuery}
                                         onChange={(e) =>
                                             setSearchQuery(e.target.value)
@@ -108,7 +110,7 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
 
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm text-gray-500">
-                                        عرض
+                                        {__('keywords.show')}
                                     </span>
                                     <select
                                         value={perPage}
@@ -131,7 +133,7 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
                                 onClick={openAddModal}
                                 className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black"
                             >
-                                اضافة مستخدم
+                                {__('keywords.add_user')}
                             </Button>
                         </div>
                     </div>
