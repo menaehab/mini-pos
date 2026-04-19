@@ -18,7 +18,7 @@ export default function Table({
     return (
         <div className="w-full overflow-x-auto rounded-lg border border-gray-100 bg-white font-['Cairo'] shadow-sm" dir="rtl">
             <table className="w-full text-right text-sm">
-                <thead className="bg-[#1b2b20] text-white">
+                <thead className="bg-[#000000] text-white">
                     <tr>
                         {columns.map((col, index) => (
                             <th key={index} className="px-6 py-4 font-medium">
