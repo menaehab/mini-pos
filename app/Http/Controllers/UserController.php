@@ -18,29 +18,22 @@ class UserController extends Controller
         $data = $request->validated();
 
         $users = User::query()
-            ->when($data['search'] ?? null, function ($query) use ($data) {
-                $query->where('name', 'like', "%{$data['search']}%")
-                    ->orWhere('email', 'like', "%{$data['search']}%")
-                    ->orWhere('phone', 'like', "%{$data['search']}%");
+            ->with('permissions:name')
+            ->when($data['search'] ?? null, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
             })
             ->latest()
             ->paginate($data['per_page'] ?? 10)
             ->withQueryString();
 
+        $permissions = Permission::pluck('name');
+
         return inertia('Users/Index', [
             'users' => $users,
             'filters' => $data,
-        ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $permissions = Permission::all();
-
-        return inertia('Users/Create', [
             'permissions' => $permissions,
         ]);
     }
@@ -55,36 +48,13 @@ class UserController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
+            'role' => $data['role'] ?? null,
             'password' => bcrypt($data['password']),
         ]);
 
         $user->syncPermissions($data['permissions'] ?? []);
 
         return redirect()->route('users.index')->with('success', __('keywords.created', ['name' => __('keywords.user')]));
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    // public function show(User $user)
-    // {
-    //     return inertia('Users/show', [
-    //         'user' => $user->load('permissions'),
-    //     ]);
-    // }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        $permissions = Permission::all();
-
-        return inertia('Users/Edit', [
-            'user' => $user->load('permissions'),
-            'permissions' => $permissions,
-        ]);
     }
 
     /**
@@ -97,7 +67,7 @@ class UserController extends Controller
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
+            'role' => $data['role'] ?? null,
             'password' => ! empty($data['password'] ?? null) ? bcrypt($data['password']) : $user->password,
         ]);
 

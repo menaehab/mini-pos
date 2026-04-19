@@ -5,7 +5,7 @@ namespace App\Http\Requests\Purchases;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class updatePurchaseRequest extends FormRequest
+class UpdatePurchaseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Purchases\SearchPurchaseRequest;
 use App\Http\Requests\Purchases\StorePurchaseRequest;
+use App\Http\Requests\Purchases\UpdatePurchaseRequest;
+use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\SupplierPayment;
-use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
@@ -58,11 +59,13 @@ class PurchaseController extends Controller
         $payment = SupplierPayment::create([
             'supplier_id' => $data['supplier_id'],
             'amount' => $data['amount'],
+            'is_first_payment' => true,
         ]);
 
         $purchase->supplierPaymentAllocations()->create([
             'supplier_payment_id' => $payment->id,
             'amount' => $data['amount'],
+            'is_first_payment' => true,
         ]);
         $total = 0;
         foreach ($data['items'] as $item) {
@@ -72,6 +75,7 @@ class PurchaseController extends Controller
                 'quantity' => $item['quantity'],
                 'purchase_price' => $item['purchase_price'],
             ]);
+            $product = Product::find($item['item_id'])->increment('stock', $item['quantity']);
         }
 
         $purchase->update([
@@ -79,7 +83,7 @@ class PurchaseController extends Controller
         ]);
 
         return redirect()->route('purchases.index', $purchase)
-            ->with('success', __('keywords.created', ['name' => __('keywords.purchase')])));
+            ->with('success', __('keywords.created', ['name' => __('keywords.purchase')]));
     }
 
     /**
@@ -109,9 +113,47 @@ class PurchaseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Purchase $purchase)
+    public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
+        $data = $request->validated();
         $purchase->load('supplier', 'items');
+
+        $purchase->items->map(function ($item) {
+            $product = Product::find($item->item_id)->decrement('stock', $item->quantity);
+            $item->delete();
+        });
+
+        $total = 0;
+
+        foreach ($request->items as $item) {
+            $total += $item['quantity'] * $item['purchase_price'];
+            $purchase->items()->create([
+                'item_id' => $item['item_id'],
+                'quantity' => $item['quantity'],
+                'purchase_price' => $item['purchase_price'],
+            ]);
+            $product = Product::find($item['item_id'])->increment('stock', $item['quantity']);
+        }
+        $purchase->update([
+            'total_price' => $total,
+            'supplier_id' => $data['supplier_id'],
+            'note' => $data['note'] ?? null,
+        ]);
+
+        $purchase->firstPayment()->delete();
+
+        $payment = SupplierPayment::create([
+            'supplier_id' => $purchase->supplier_id,
+            'amount' => $total,
+            'is_first_payment' => true,
+        ]);
+
+        $purchase->supplierPaymentAllocations()->create([
+            'supplier_payment_id' => $payment->id,
+            'amount' => $total,
+            'is_first_payment' => true,
+        ]);
+
     }
 
     /**
@@ -119,6 +161,9 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
-        //
+        $purchase->delete();
+
+        return redirect()->route('purchases.index')
+            ->with('success', __('keywords.deleted', ['name' => __('keywords.purchase')]));
     }
 }

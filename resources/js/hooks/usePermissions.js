@@ -3,9 +3,7 @@ import { usePage } from '@inertiajs/react';
 export function usePermissions() {
     const { user_permissions } = usePage().props;
 
-    const permissions = Array.isArray(user_permissions)
-        ? user_permissions
-        : [];
+    const permissions = Array.isArray(user_permissions) ? user_permissions : [];
 
     const can = (permission) => {
         if (!permission) return false;

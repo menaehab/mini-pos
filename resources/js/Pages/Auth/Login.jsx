@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { lang } from '@erag/lang-sync-inertia/react';
+import useTranslation from '@/hooks/useTranslation';
 import { Head, useForm } from '@inertiajs/react';
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -16,14 +15,13 @@ export default function Login({ status, canResetPassword }) {
         });
     };
 
-    const { __ } = lang();
+    const { __ } = useTranslation();
 
     return (
         <>
             <div className="flex h-screen w-full">
-                <Head title="تسجيل الدخول - SOLVEX" />
+                <Head title={__('keywords.login')} />
 
-                {/* Left Side: Branding Section */}
                 <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-t from-[#000000] to-[#404040] lg:flex lg:w-4/5">
                     <div className="pointer-events-none absolute -bottom-20 -left-20 h-[500px] w-[500px] opacity-40">
                         <svg
@@ -31,7 +29,6 @@ export default function Login({ status, canResetPassword }) {
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-full w-full"
                         >
-                            {/* الدائرة الداخلية */}
                             <circle
                                 cx="130"
                                 cy="350"
@@ -53,7 +50,6 @@ export default function Login({ status, canResetPassword }) {
                         </svg>
                     </div>
                     <div className="z-10 p-8 text-center">
-                        {/* Logo Section */}
                         <div className="mb-6 flex flex-col items-center">
                             <img
                                 src="logo_1.png"
@@ -63,17 +59,14 @@ export default function Login({ status, canResetPassword }) {
                             />
                         </div>
 
-                        {/* Slogan */}
                         <h2 className="mt-3 text-4xl font-light leading-relaxed text-white">
                             خلّي البيع يمشي صح وبسهولة
                         </h2>
                     </div>
                 </div>
 
-                {/* Right Side: Form Section */}
                 <div className="flex w-full flex-col items-center justify-center bg-white px-8 md:px-16 lg:w-1/2">
                     <div className="w-full max-w-md">
-                        {/* Greeting Header */}
                         <div className="mx-2 mb-12 text-start" dir="rtl">
                             <h3 className="mb-2 text-3xl font-bold text-gray-900">
                                 نورتنا تاني
@@ -83,7 +76,6 @@ export default function Login({ status, canResetPassword }) {
                             </p>
                         </div>
 
-                        {/* Login Form */}
                         <form onSubmit={submit} className="space-y-6" dir="rtl">
                             <div className="relative">
                                 <input
@@ -93,7 +85,7 @@ export default function Login({ status, canResetPassword }) {
                                     autoComplete="username"
                                     onChange={(e) =>
                                         setData('email', e.target.value)
-                                    } // تحديث البيانات
+                                    }
                                     placeholder="عنوان البريد الإلكتروني"
                                     className="w-full rounded-full border border-gray-100 bg-gray-50 px-5 py-4 pr-12 transition-all focus:outline-none focus:ring-2 focus:ring-black"
                                     required
@@ -114,7 +106,7 @@ export default function Login({ status, canResetPassword }) {
                                         />
                                     </svg>
                                 </span>
-                                {/* error message */}
+
                                 {errors.email && (
                                     <div className="mr-4 mt-1 text-xs text-red-500">
                                         {errors.email}
@@ -126,11 +118,11 @@ export default function Login({ status, canResetPassword }) {
                                 <input
                                     type="password"
                                     name="password"
-                                    value={data.password} // ربط القيمة
+                                    value={data.password}
                                     autoComplete="current-password"
                                     onChange={(e) =>
                                         setData('password', e.target.value)
-                                    } // تحديث البيانات
+                                    }
                                     placeholder="كلمة المرور"
                                     className="w-full rounded-full border border-gray-100 bg-gray-50 px-5 py-4 pr-12 transition-all focus:outline-none focus:ring-2 focus:ring-black"
                                     required
@@ -151,7 +143,7 @@ export default function Login({ status, canResetPassword }) {
                                         />
                                     </svg>
                                 </span>
-                                {/* error message */}
+
                                 {errors.password && (
                                     <div className="mr-4 mt-1 text-xs text-red-500">
                                         {errors.password}

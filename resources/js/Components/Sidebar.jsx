@@ -134,7 +134,7 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
                     <Link
                         href={getSafeRoute('users.index')}
                         onClick={handleItemClick}
-                        className={`flex items-center bg-black text-white transition-colors hover:bg-gray-800 ${
+                        className={`flex items-center bg-black text-white transition-colors hover:bg-gray-900 ${
                             isExpanded
                                 ? 'w-full justify-start gap-4 rounded-lg px-4 py-2.5'
                                 : 'h-[48px] w-[48px] justify-center rounded-full p-3'

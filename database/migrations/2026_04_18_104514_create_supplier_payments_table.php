@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->decimal('amount', 10, 2);
             $table->text('note')->nullable();
+            $table->boolean('is_first_payment')->default(false);
             $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnUpdate();
             $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate();
             $table->timestamps();
