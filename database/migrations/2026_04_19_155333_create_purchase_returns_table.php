@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_returns', function (Blueprint $table) {
             $table->id();
+            $table->string('number')->unique();
             $table->decimal('total_price', 10, 2);
             $table->text('note')->nullable();
             $table->boolean('is_refunded')->default(false);

@@ -109,4 +109,11 @@ class PurchaseController extends Controller
         return redirect()->route('purchases.index')
             ->with('success', __('keywords.deleted', ['name' => __('keywords.purchase')]));
     }
+
+    public function getPurchase($number)
+    {
+        $purchase = Purchase::where('number', $number)->first();
+
+        return $purchase->load('supplier', 'items');
+    }
 }

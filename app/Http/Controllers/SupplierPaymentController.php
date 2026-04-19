@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SupplierPayment\SearchSupplierPaymentRequest;
-use App\Http\Requests\SupplierPayment\StoreSupplierPaymentRequest;
-use App\Http\Requests\SupplierPayment\UpdateSupplierPaymentRequest;
+use App\Http\Requests\SupplierPayments\SearchSupplierPaymentRequest;
+use App\Http\Requests\SupplierPayments\StoreSupplierPaymentRequest;
+use App\Http\Requests\SupplierPayments\UpdateSupplierPaymentRequest;
 use App\Models\SupplierPayment;
 use Illuminate\Support\Facades\DB;
 

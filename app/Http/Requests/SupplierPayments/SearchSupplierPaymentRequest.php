@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\SupplierPayment;
+namespace App\Http\Requests\SupplierPayments;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;

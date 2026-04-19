@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
@@ -75,6 +76,11 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
         ->middleware('permission:view_products|manage_products');
 
     // purchases
+
+    Route::get('purchases/get-purchase/{number}', [PurchaseController::class, 'getPurchase'])
+        ->name('purchases.get_purchase')
+        ->middleware('permission:view_purchases|manage_purchases');
+
     Route::get('purchases', [PurchaseController::class, 'index'])
         ->name('purchases.index')
         ->middleware('permission:view_purchases|manage_purchases');
@@ -101,6 +107,23 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
 
     Route::delete('purchases/{purchase}', [PurchaseController::class, 'destroy'])
         ->name('purchases.destroy')
+        ->middleware('permission:manage_purchases');
+
+    // purchase returns
+    Route::get('purchase-returns', [PurchaseReturnController::class, 'index'])
+        ->name('purchase_returns.index')
+        ->middleware('permission:view_purchases|manage_purchases');
+
+    Route::post('purchase-returns', [PurchaseReturnController::class, 'store'])
+        ->name('purchase_returns.store')
+        ->middleware('permission:edit_purchases|manage_purchases');
+
+    Route::put('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'update'])
+        ->name('purchase_returns.update')
+        ->middleware('permission:edit_purchases|manage_purchases');
+
+    Route::delete('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'destroy'])
+        ->name('purchase_returns.destroy')
         ->middleware('permission:manage_purchases');
 
     // supplier payments
