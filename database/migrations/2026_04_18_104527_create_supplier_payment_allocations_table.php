@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('supplier_payment_allocations', function (Blueprint $table) {
             $table->id();
+            $table->boolean('is_first_payment')->default(false);
             $table->foreignId('supplier_payment_id')->constrained('supplier_payments')->cascadeOnUpdate();
             $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnUpdate();
             $table->timestamps();

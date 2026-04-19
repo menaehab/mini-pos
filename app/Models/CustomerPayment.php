@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CustomerPayment extends Model
+{
+    protected $fillable = [
+        'amount',
+        'note',
+        'customer_id',
+        'user_id',
+    ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function allocations()
+    {
+        return $this->hasMany(CustomerPaymentAllocation::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}

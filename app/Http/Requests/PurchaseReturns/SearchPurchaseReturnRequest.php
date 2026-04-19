@@ -11,7 +11,7 @@ class SearchPurchaseReturnRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('view_purchases') || auth()->user()->can('manage_purchases');
+        return auth()->user()->can('view_purchase_returns') || auth()->user()->can('manage_purchase_returns');
     }
 
     /**

@@ -4,7 +4,11 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseReturnController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -109,19 +113,52 @@ Route::middleware('auth')->group(function () {
     // purchase returns
     Route::get('purchase-returns', [PurchaseReturnController::class, 'index'])
         ->name('purchase-returns.index')
-        ->middleware('permission:view_purchases|manage_purchases');
+        ->middleware('permission:view_purchase_returns|manage_purchase_returns');
 
     Route::post('purchase-returns', [PurchaseReturnController::class, 'store'])
         ->name('purchase-returns.store')
-        ->middleware('permission:edit_purchases|manage_purchases');
+        ->middleware('permission:add_purchase_returns|manage_purchase_returns');
 
     Route::put('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'update'])
         ->name('purchase-returns.update')
-        ->middleware('permission:edit_purchases|manage_purchases');
+        ->middleware('permission:edit_purchase_returns|manage_purchase_returns');
 
     Route::delete('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'destroy'])
         ->name('purchase-returns.destroy')
-        ->middleware('permission:manage_purchases');
+        ->middleware('permission:manage_purchase_returns');
+
+    // sales
+    Route::get('sales/get-sale/{id}', [SaleController::class, 'getSale'])
+        ->name('sales.get-sale')
+        ->middleware('permission:view_sales|manage_sales');
+
+    Route::get('sales', [SaleController::class, 'index'])
+        ->name('sales.index')
+        ->middleware('permission:view_sales|manage_sales');
+
+    Route::get('sales/create', [SaleController::class, 'create'])
+        ->name('sales.create')
+        ->middleware('permission:add_sales|manage_sales');
+
+    Route::post('sales', [SaleController::class, 'store'])
+        ->name('sales.store')
+        ->middleware('permission:add_sales|manage_sales');
+
+    Route::get('sales/{sale}', [SaleController::class, 'show'])
+        ->name('sales.show')
+        ->middleware('permission:view_sales|manage_sales');
+
+    Route::get('sales/{sale}/edit', [SaleController::class, 'edit'])
+        ->name('sales.edit')
+        ->middleware('permission:edit_sales|manage_sales');
+
+    Route::put('sales/{sale}', [SaleController::class, 'update'])
+        ->name('sales.update')
+        ->middleware('permission:edit_sales|manage_sales');
+
+    Route::delete('sales/{sale}', [SaleController::class, 'destroy'])
+        ->name('sales.destroy')
+        ->middleware('permission:manage_sales');
 
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])
