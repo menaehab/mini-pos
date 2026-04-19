@@ -30,15 +30,17 @@ Route::middleware('auth')->group(function () {
 
     // customers
     Route::get('customers', [CustomerController::class, 'index'])
+        ->name('customers.index') 
         ->middleware('permission:view_customers|manage_customers');
 
     Route::resource('customers', CustomerController::class)
         ->except(['index', 'show'])
         ->middleware('permission:manage_customers');
 
+    
     Route::get('customers/{customer}', [CustomerController::class, 'show'])
+        ->name('customers.show') 
         ->middleware('permission:view_customers|manage_customers');
-
     // categories
     Route::get('categories', [CategoryController::class, 'index'])
         ->middleware('permission:view_categories|manage_categories');
