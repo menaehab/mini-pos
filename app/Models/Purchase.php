@@ -34,4 +34,9 @@ class Purchase extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+
+    public function firstPayment()
+    {
+        return $this->hasOne(SupplierPayment::class)->where('is_first_payment', true);
+    }
 }

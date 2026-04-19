@@ -64,6 +64,8 @@ return [
     'categories' => 'الفئات',
     'product' => 'المنتج',
     'products' => 'المنتجات',
+    'purchase' => 'الشراء',
+    'purchases' => 'المشتريات',
     'manage_users' => 'إدارة المستخدمين',
     'view_users' => 'عرض المستخدمين',
     'manage_suppliers' => 'إدارة الموردين',
@@ -75,4 +77,6 @@ return [
     'manage_products' => 'إدارة المنتجات',
     'view_products' => 'عرض المنتجات',
     'add_customer' => 'إضافة عميل',
+    'view_supplier_payments' => 'عرض مدفوعات الموردين',
+    'supplier_payment' => 'مدفوعات الموردين',
 ];
