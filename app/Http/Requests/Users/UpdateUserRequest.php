@@ -37,13 +37,7 @@ class UpdateUserRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
 
-            'phone' => [
-                'required_without_all:email',
-                'nullable',
-                'string',
-                'regex:/^01(0|1|2|5)[0-9]{8}$/',
-                Rule::unique('users', 'phone')->ignore($user->id),
-            ],
+            'role' => ['nullable', 'string'],
 
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'permissions' => ['nullable', 'array'],
@@ -56,7 +50,6 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => __('keywords.name'),
             'email' => __('keywords.email'),
-            'phone' => __('keywords.phone'),
             'password' => __('keywords.password'),
             'permissions' => __('keywords.permissions'),
         ];

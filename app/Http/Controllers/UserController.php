@@ -18,22 +18,23 @@ class UserController extends Controller
         $data = $request->validated();
 
         $users = User::query()
-            ->when($data['search'] ?? null, function ($query) use ($data) {
-                $query->where('name', 'like', "%{$data['search']}%")
-                    ->orWhere('email', 'like', "%{$data['search']}%")
-                    ->orWhere('phone', 'like', "%{$data['search']}%");
+            ->with('permissions:name')
+            ->when($data['search'] ?? null, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
             })
             ->latest()
             ->paginate($data['per_page'] ?? 10)
             ->withQueryString();
 
-        $permissions = Permission::all();
+        $permissions = Permission::pluck('name');
 
         return inertia('Users/Index', [
             'users' => $users,
             'filters' => $data,
             'permissions' => $permissions,
-
         ]);
     }
 
@@ -47,7 +48,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
+            'role' => $data['role'] ?? null,
             'password' => bcrypt($data['password']),
         ]);
 
@@ -66,7 +67,7 @@ class UserController extends Controller
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
+            'role' => $data['role'] ?? null,
             'password' => ! empty($data['password'] ?? null) ? bcrypt($data['password']) : $user->password,
         ]);
 
