@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import MainLayout from '@/Layouts/MainLayout';
-import Table from '@/Components/Table';
 import Button from '@/Components/Button';
-import CustomerModal from '@/Components/CustomerModal'; 
+import CustomerModal from '@/Components/CustomerModal';
 import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
+import Table from '@/Components/Table';
 import useTranslation from '@/hooks/useTranslation';
-import { Search } from 'lucide-react';
+import MainLayout from '@/Layouts/MainLayout';
 import { Head, router } from '@inertiajs/react';
+import { Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Index({ customers = {}, filters = {} }) {
     const { __ } = useTranslation();
@@ -27,9 +27,10 @@ export default function Index({ customers = {}, filters = {} }) {
         }
 
         const delaySearch = setTimeout(() => {
-            router.get(route('customers.index'), 
-                { search: searchQuery, per_page: perPage }, 
-                { preserveState: true, preserveScroll: true, replace: true }
+            router.get(
+                route('customers.index'),
+                { search: searchQuery, per_page: perPage },
+                { preserveState: true, preserveScroll: true, replace: true },
             );
         }, 400);
         return () => clearTimeout(delaySearch);
@@ -70,95 +71,107 @@ export default function Index({ customers = {}, filters = {} }) {
     const columns = [
         { header: 'الاسم', accessor: 'name' },
         { header: 'رقم التليفون', accessor: 'phone' },
-        { header: 'الرقم القومي', accessor: 'national_number' }, 
+        { header: 'الرقم القومي', accessor: 'national_number' },
         { header: 'العنوان', accessor: 'address' },
-        { 
-            header: 'الرصيد', 
+        {
+            header: 'الرصيد',
             accessor: 'balance',
             render: (row) => (
-                <span className="bg-black text-white px-3 py-1 rounded-full text-xs font-bold inline-block">
+                <span className="inline-block rounded-full bg-black px-3 py-1 text-xs font-bold text-white">
                     {row.balance || 0} جنيه
                 </span>
-            )
+            ),
         },
     ];
 
     return (
         <>
-            <Head title="العملاء" />
-            
-            <div className="max-w-6xl mx-auto relative mb-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-2xl font-bold text-gray-800">العملاء</h1>
+            <Head title={__('keywords.customers')} />
+
+            <div className="relative mx-auto mb-8 max-w-6xl">
+                <div className="mb-8 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        {__('keywords.customers')}
+                    </h1>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex w-full items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="relative w-72">
-                                    <input
-                                        type="text"
-                                        placeholder={__('keywords.search') || "بحث"}
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-200 py-2 pl-10 pr-4 text-right focus:border-black focus:outline-none"
-                                        dir="rtl"
-                                    />
-                                    <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-500">
-                                        {__('keywords.show')}
-                                    </span>
-                                    <select
-                                        value={perPage}
-                                        onChange={(e) => setPerPage(e.target.value)}
-                                        className="cursor-pointer appearance-none rounded-lg border border-gray-200 bg-none px-2 py-2 text-center focus:border-black focus:outline-none"
-                                        style={{ backgroundImage: 'none' }}
-                                        dir="ltr"
-                                    >
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                </div>
+                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <div className="mb-6 flex w-full items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="relative w-72">
+                                <input
+                                    type="text"
+                                    placeholder={__('keywords.search')}
+                                    value={searchQuery}
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-gray-200 py-2 pl-10 pr-4 text-right focus:border-black focus:outline-none"
+                                    dir="rtl"
+                                />
+                                <Search
+                                    className="absolute left-3 top-2.5 text-gray-400"
+                                    size={18}
+                                />
                             </div>
 
-                            <Button onClick={openAddModal} className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black">
-                                اضافة عميل
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">
+                                    {__('keywords.show')}
+                                </span>
+                                <select
+                                    value={perPage}
+                                    onChange={(e) => setPerPage(e.target.value)}
+                                    className="cursor-pointer appearance-none rounded-lg border border-gray-200 bg-none px-2 py-2 text-center focus:border-black focus:outline-none"
+                                    style={{ backgroundImage: 'none' }}
+                                    dir="ltr"
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
                         </div>
 
-                    <Table 
-                        columns={columns} 
-                        data={customers?.data || []} 
+                        <Button
+                            onClick={openAddModal}
+                            className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black"
+                        >
+                            {__('keywords.add_customer')}
+                        </Button>
+                    </div>
+
+                    <Table
+                        columns={columns}
+                        data={customers?.data || []}
                         pagination={customers}
-                        onView={handleView} 
-                        onEdit={handleEdit} 
-                        onDelete={handleDelete} 
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
                     />
                 </div>
             </div>
 
-            <CustomerModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                customer={selectedCustomer} 
+            <CustomerModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                customer={selectedCustomer}
             />
 
             <DeleteConfirmModal
                 isOpen={deleteModalOpen}
-                onClose={() => { setDeleteModalOpen(false); setCustomerToDelete(null); }}
+                onClose={() => {
+                    setDeleteModalOpen(false);
+                    setCustomerToDelete(null);
+                }}
                 onConfirm={confirmDelete}
                 userName={customerToDelete?.name}
-                entityName="العميل"
+                entityName={__('keywords.customer')}
                 processing={deleteProcessing}
             />
         </>
     );
-
 }
 
 Index.layout = (page) => <MainLayout>{page}</MainLayout>;

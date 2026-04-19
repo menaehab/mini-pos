@@ -74,4 +74,5 @@ return [
     'view_categories' => 'عرض الفئات',
     'manage_products' => 'إدارة المنتجات',
     'view_products' => 'عرض المنتجات',
+    'add_customer' => 'إضافة عميل',
 ];
