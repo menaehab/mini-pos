@@ -49,9 +49,6 @@ class StorePurchaseReturnRequest extends FormRequest
                 }
 
                 $purchase = Purchase::with('items')->find($this->purchase_id);
-                if (! $purchase) {
-                    return;
-                }
 
                 $requested = [];
                 foreach ($this->items as $item) {
@@ -84,7 +81,7 @@ class StorePurchaseReturnRequest extends FormRequest
                     $purchasedQty = $purchased[$product->name] ?? 0;
 
                     if ($purchasedQty == 0) {
-                        $validator->errors()->add('items', 'Product not in this purchase.');
+                        $validator->errors()->add('items', __('keywords.add', ['item' => $product->name]).' '.__('keywords.to_purchase_first'));
 
                         continue;
                     }
@@ -94,7 +91,10 @@ class StorePurchaseReturnRequest extends FormRequest
                     if ($qty > $remaining) {
                         $validator->errors()->add(
                             'items',
-                            "Quantity for {$product->name} exceeds available."
+                            __('keywords.return_quantity_exceeds_remaining', [
+                                'item' => $product->name,
+                                'remaining' => $remaining,
+                            ])
                         );
                     }
                 }

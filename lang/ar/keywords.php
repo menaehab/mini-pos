@@ -79,4 +79,6 @@ return [
     'add_customer' => 'إضافة عميل',
     'view_supplier_payments' => 'عرض مدفوعات الموردين',
     'supplier_payment' => 'مدفوعات الموردين',
+    'to_purchase_first' => 'لإضافته إلى هذه الشراء',
+    'return_quantity_exceeds_remaining' => 'كمية الإرجاع للمنتج :item تتجاوز الكمية المتبقية :remaining',
 ];
