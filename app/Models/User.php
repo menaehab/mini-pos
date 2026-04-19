@@ -30,4 +30,19 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function purchaseReturns()
+    {
+        return $this->hasMany(PurchaseReturn::class);
+    }
+
+    public function purchase()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
+    public function supplierPayments()
+    {
+        return $this->hasMany(SupplierPayment::class);
+    }
 }
