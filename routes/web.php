@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -102,6 +103,20 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
     Route::delete('purchases/{purchase}', [PurchaseController::class, 'destroy'])
         ->name('purchases.destroy')
         ->middleware('permission:manage_purchases');
+
+    // supplier payments
+    Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])
+        ->name('supplier_payments.index')
+        ->middleware('permission:view_supplier_payments|manage_supplier_payments');
+    Route::post('supplier-payments', [SupplierPaymentController::class, 'store'])
+        ->name('supplier_payments.store')
+        ->middleware('permission:create_supplier_payments|manage_supplier_payments');
+    Route::put('supplier-payments/{supplierPayment}', [SupplierPaymentController::class, 'update'])
+        ->name('supplier_payments.update')
+        ->middleware('permission:update_supplier_payments|manage_supplier_payments');
+    Route::delete('supplier-payments/{supplierPayment}', [SupplierPaymentController::class, 'destroy'])
+        ->name('supplier_payments.destroy')
+        ->middleware('permission:manage_supplier_payments');
 
 });
 require __DIR__.'/auth.php';
