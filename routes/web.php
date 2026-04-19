@@ -25,9 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('suppliers', SupplierController::class)
         ->except(['index', 'show'])
         ->middleware('permission:manage_suppliers');
-
+        
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])
-        ->name('suppliers.show')
+        ->name('suppliers.show') // <-- إضافة الاسم هنا عشان أيقونة العين تشتغل
         ->middleware('permission:view_suppliers');
 
     // customers
