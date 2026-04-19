@@ -40,6 +40,6 @@ class Purchase extends Model
 
     public function firstPayment()
     {
-        return $this->hasOne(SupplierPayment::class)->where('is_first_payment', true);
+        return $this->hasOne(SupplierPaymentAllocation::class)->where('is_first_payment', true);
     }
 }

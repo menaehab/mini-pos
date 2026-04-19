@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Requests\SupplierPayments;
+namespace App\Http\Requests\CustomerPayments;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSupplierPaymentRequest extends FormRequest
+class UpdateCustomerPaymentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('edit_supplier_payments') || auth()->user()->can('manage_supplier_payments');
+        return auth()->user()->can('edit_customer_payments') || auth()->user()->can('manage_customer_payments');
     }
 
     /**
@@ -24,7 +24,7 @@ class UpdateSupplierPaymentRequest extends FormRequest
         return [
             'amount' => ['required', 'numeric', 'min:0.01'],
             'note' => ['nullable', 'string'],
-            'supplier_id' => ['required', 'integer', 'exists:suppliers,id'],
+            'customer_id' => ['required', 'integer', 'exists:customers,id'],
         ];
     }
 }
