@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function Index({ users = {}, filters = {}, permissions = [] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
+    const [perPage, setPerPage] = useState(filters.per_page || '10');
 
     const [selectedUser, setSelectedUser] = useState(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
         const delaySearch = setTimeout(() => {
             router.get(
                 route('users.index'),
-                { search: searchQuery },
+                { search: searchQuery, per_page: perPage },
                 {
                     preserveState: true,
                     preserveScroll: true,
@@ -37,7 +38,7 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
         }, 400);
 
         return () => clearTimeout(delaySearch);
-    }, [searchQuery]);
+    }, [searchQuery, perPage]);
 
     const handleDelete = (user) => {
         setUserToDelete(user);
@@ -86,32 +87,59 @@ export default function Index({ users = {}, filters = {}, permissions = [] }) {
 
                 <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div className="mb-6 flex items-center justify-between gap-4">
-                        <div className="relative w-72">
-                            <input
-                                type="text"
-                                placeholder="بحث"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 py-2 pl-10 pr-4 text-right focus:border-black focus:outline-none"
-                                dir="rtl"
-                            />
-                            <Search
-                                className="absolute left-3 top-2.5 text-gray-400"
-                                size={18}
-                            />
-                        </div>
+                        <div className="flex w-full items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="relative w-72">
+                                    <input
+                                        type="text"
+                                        placeholder="بحث"
+                                        value={searchQuery}
+                                        onChange={(e) =>
+                                            setSearchQuery(e.target.value)
+                                        }
+                                        className="w-full rounded-lg border border-gray-200 py-2 pl-10 pr-4 text-right focus:border-black focus:outline-none"
+                                        dir="rtl"
+                                    />
+                                    <Search
+                                        className="absolute left-3 top-2.5 text-gray-400"
+                                        size={18}
+                                    />
+                                </div>
 
-                        <Button
-                            onClick={openAddModal}
-                            className="rounded-lg bg-[#1a202c] px-6 hover:bg-black"
-                        >
-                            اضافة مستخدم
-                        </Button>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-500">
+                                        عرض
+                                    </span>
+                                    <select
+                                        value={perPage}
+                                        onChange={(e) =>
+                                            setPerPage(e.target.value)
+                                        }
+                                        className="cursor-pointer appearance-none rounded-lg border border-gray-200 bg-none px-2 py-2 text-center focus:border-black focus:outline-none"
+                                        style={{ backgroundImage: 'none' }}
+                                        dir="ltr"
+                                    >
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <Button
+                                onClick={openAddModal}
+                                className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black"
+                            >
+                                اضافة مستخدم
+                            </Button>
+                        </div>
                     </div>
 
                     <Table
                         columns={columns}
                         data={users?.data || []}
+                        pagination={users}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                     />

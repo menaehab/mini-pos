@@ -6,7 +6,7 @@ return [
     'deleted' => 'تم الحذف بنجاح',
     'user' => 'المستخدم',
     'users' => 'المستخدمين',
-    
+
     // Login page translations
     'welcome_back' => 'نورتنا تاني',
     'we_are_happy_to_see_you' => 'رجوعك فرحنا',
@@ -17,7 +17,7 @@ return [
     'forgot_password' => 'نسيت كلمة المرور؟',
     'dont_have_account' => 'ليس لديك حساب؟',
     'create_account' => 'إنشاء حساب',
-    
+
     // General UI
     'login' => 'تسجيل الدخول',
     'register' => 'التسجيل',
