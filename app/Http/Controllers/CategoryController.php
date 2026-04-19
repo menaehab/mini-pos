@@ -31,11 +31,6 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return Inertia::render('categories/Create');
-    }
-
     public function store(StoreCategoryRequest $request)
     {
         $data = $request->validated();
@@ -43,22 +38,6 @@ class CategoryController extends Controller
 
         return redirect()->route('categories.index')
             ->with('success', __('keywords.created', ['name' => __('keywords.category')]));
-    }
-
-    public function show(Category $category)
-    {
-        $category->loadCount('items');
-
-        return Inertia::render('categories/Show', [
-            'category' => $category,
-        ]);
-    }
-
-    public function edit(Category $category)
-    {
-        return Inertia::render('categories/Edit', [
-            'category' => $category,
-        ]);
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)

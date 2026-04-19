@@ -28,11 +28,6 @@ class SupplierController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        return inertia('Suppliers/Create');
-    }
-
     public function store(StoreSupplierRequest $request)
     {
         $data = $request->validated();
@@ -47,13 +42,6 @@ class SupplierController extends Controller
     public function show(Supplier $supplier)
     {
         return inertia('Suppliers/Show', [
-            'supplier' => $supplier,
-        ]);
-    }
-
-    public function edit(Supplier $supplier)
-    {
-        return inertia('Suppliers/Edit', [
             'supplier' => $supplier,
         ]);
     }
@@ -76,9 +64,9 @@ class SupplierController extends Controller
         return redirect()->route('suppliers.index')->with('success', __('keywords.deleted', ['name' => __('keywords.supplier')]));
     }
 
-    // ─────────────────────────────────────────────
+    // ──────────────────────────────────────────────
     // Search Suppliers
-    // ─────────────────────────────────────────────
+    // ──────────────────────────────────────────────
     public function searchSuppliers(SearchSupplierRequest $request)
     {
         $limit = min($request->per_page ?? 20, 50);
