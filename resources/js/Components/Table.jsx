@@ -6,6 +6,9 @@ export default function Table({
     data,
     onEdit,
     onDelete,
+    canView = true,
+    canEdit = true,
+    canDelete = true,
     pagination = null,
 }) {
     return (
@@ -43,18 +46,22 @@ export default function Table({
                                         </td>
                                     ))}
                                     <td className="flex items-center justify-end gap-3 px-6 py-4 text-left">
-                                        <button
-                                            onClick={() => onEdit(row)}
-                                            className="text-gray-400 hover:text-[#1b2b20]"
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => onDelete(row)}
-                                            className="text-red-400 hover:text-red-600"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                                        {canEdit && (
+                                            <button
+                                                onClick={() => onEdit(row)}
+                                                className="text-gray-400 hover:text-[#1b2b20]"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                        )}
+                                        {canDelete && (
+                                            <button
+                                                onClick={() => onDelete(row)}
+                                                className="text-red-400 hover:text-red-600"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))

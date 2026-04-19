@@ -2,6 +2,7 @@ import Button from '@/Components/Button';
 import CustomerModal from '@/Components/CustomerModal';
 import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
 import Table from '@/Components/Table';
+import { usePermissions } from '@/hooks/usePermissions';
 import useTranslation from '@/hooks/useTranslation';
 import MainLayout from '@/Layouts/MainLayout';
 import { Head, router } from '@inertiajs/react';
@@ -35,7 +36,7 @@ export default function Index({ customers = {}, filters = {} }) {
         }, 400);
         return () => clearTimeout(delaySearch);
     }, [searchQuery, perPage]);
-
+    const { can } = usePermissions();
     const handleDelete = (customer) => {
         setCustomerToDelete(customer);
         setDeleteModalOpen(true);
@@ -134,12 +135,14 @@ export default function Index({ customers = {}, filters = {} }) {
                             </div>
                         </div>
 
-                        <Button
-                            onClick={openAddModal}
-                            className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black"
-                        >
-                            {__('keywords.add_customer')}
-                        </Button>
+                        {can('manage_customers') && (
+                            <Button
+                                onClick={openAddModal}
+                                className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black"
+                            >
+                                {__('keywords.add_customer')}
+                            </Button>
+                        )}
                     </div>
 
                     <Table
@@ -149,6 +152,9 @@ export default function Index({ customers = {}, filters = {} }) {
                         onView={handleView}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        canView={can('view_customers')}
+                        canEdit={can('manage_customers')}
+                        canDelete={can('manage_customers')}
                     />
                 </div>
             </div>
