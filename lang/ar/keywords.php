@@ -64,6 +64,8 @@ return [
     'categories' => 'الفئات',
     'product' => 'المنتج',
     'products' => 'المنتجات',
+    'purchase' => 'الشراء',
+    'purchases' => 'المشتريات',
     'manage_users' => 'إدارة المستخدمين',
     'view_users' => 'عرض المستخدمين',
     'manage_suppliers' => 'إدارة الموردين',

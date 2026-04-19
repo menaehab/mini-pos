@@ -23,6 +23,14 @@ class PermissionSeeder extends Seeder
             'view_categories',
             'manage_products',
             'view_products',
+            'manage_purchases',
+            'view_purchases',
+            'add_purchases',
+            'edit_purchases',
+            'manage_supplier_payments',
+            'add_supplier_payments',
+            'edit_supplier_payments',
+            'view_supplier_payments',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
