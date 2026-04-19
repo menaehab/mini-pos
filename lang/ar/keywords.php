@@ -7,7 +7,7 @@ return [
     'user' => 'المستخدم',
     'users' => 'المستخدمين',
 
-    // Login page translations
+    // Login
     'welcome_back' => 'نورتنا تاني',
     'we_are_happy_to_see_you' => 'رجوعك فرحنا',
     'email_address' => 'البريد الإلكتروني',
@@ -18,7 +18,7 @@ return [
     'dont_have_account' => 'ليس لديك حساب؟',
     'create_account' => 'إنشاء حساب',
 
-    // General UI
+    // GUI
     'login' => 'تسجيل الدخول',
     'register' => 'التسجيل',
     'logout' => 'تسجيل الخروج',
@@ -56,31 +56,46 @@ return [
     'password_min_length' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
     'password_mismatch' => 'كلمة المرور غير متطابقة',
     'leave_blank_if_not_changing' => 'اتركه فارغاً إذا لم ترد تغييره',
+
+    // Entities
     'supplier' => 'المورد',
     'suppliers' => 'الموردين',
     'customer' => 'العميل',
     'customers' => 'العملاء',
-    'category' => 'الفئة',
-    'categories' => 'الفئات',
+    'category' => 'القسم',
+    'categories' => 'الأقسام',
     'product' => 'المنتج',
     'products' => 'المنتجات',
     'purchase' => 'الشراء',
     'purchases' => 'المشتريات',
+
+    // Permissions
     'manage_users' => 'إدارة المستخدمين',
     'view_users' => 'عرض المستخدمين',
     'manage_suppliers' => 'إدارة الموردين',
     'view_suppliers' => 'عرض الموردين',
     'manage_customers' => 'إدارة العملاء',
     'view_customers' => 'عرض العملاء',
-    'manage_categories' => 'إدارة الفئات',
-    'view_categories' => 'عرض الفئات',
+    'manage_categories' => 'إدارة الأقسام',
+    'view_categories' => 'عرض الأقسام',
     'manage_products' => 'إدارة المنتجات',
     'view_products' => 'عرض المنتجات',
     'add_customer' => 'إضافة عميل',
+
+    // Payments & Returns
     'view_supplier_payments' => 'عرض مدفوعات الموردين',
     'supplier_payment' => 'مدفوعات الموردين',
     'to_purchase_first' => 'لإضافته إلى هذه الشراء',
     'return_quantity_exceeds_remaining' => 'كمية الإرجاع للمنتج :item تتجاوز الكمية المتبقية :remaining',
+
+    // Product
+    'product_code' => 'كود المنتج',
+    'quantity' => 'الكمية',
+    'min_quantity' => 'الحد الأدنى',
+    'purchase_price' => 'سعر الشراء',
+    'sale_price' => 'سعر البيع',
+    'description' => 'الوصف',
+    'required' => 'مطلوب',
     'cash' => 'كاش',
     'installment' => 'قسط',
 ];
