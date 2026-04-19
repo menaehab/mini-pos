@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('supplier_payments', function (Blueprint $table) {
+        Schema::create('purchase_returns', function (Blueprint $table) {
             $table->id();
-            $table->decimal('amount', 10, 2);
+            $table->string('number')->unique();
+            $table->decimal('total_price', 10, 2);
             $table->text('note')->nullable();
-            $table->boolean('is_first_payment')->default(false);
-            $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnUpdate();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate();
+            $table->boolean('is_refunded')->default(false);
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supplier_payments');
+        Schema::dropIfExists('purchase_returns');
     }
 };

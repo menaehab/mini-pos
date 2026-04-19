@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Observers\PurchaseObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
     'user_id',
     'supplier_id',
 ])]
+#[ObservedBy(PurchaseObserver::class)]
 class Purchase extends Model
 {
     public function items()
@@ -33,5 +36,10 @@ class Purchase extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function firstPayment()
+    {
+        return $this->hasOne(SupplierPayment::class)->where('is_first_payment', true);
     }
 }
