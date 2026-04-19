@@ -11,7 +11,6 @@ export default function Index({ customers = {}, filters = {} }) {
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-    // لوجيك البحث (Live Search)
     useEffect(() => {
         const delaySearch = setTimeout(() => {
             router.get(route('customers.index'), 
@@ -22,7 +21,6 @@ export default function Index({ customers = {}, filters = {} }) {
         return () => clearTimeout(delaySearch);
     }, [searchQuery]);
 
-    // دوال الحذف والتعديل والعرض
     const handleDelete = (customer) => {
         if (confirm(`هل أنت متأكد من حذف العميل "${customer.name}"؟`)) {
             router.delete(route('customers.destroy', customer.id), { preserveScroll: true });
@@ -43,7 +41,6 @@ export default function Index({ customers = {}, filters = {} }) {
         router.get(route('customers.show', customer.id));
     };
 
-    // أعمدة الجدول (تم تعديل accessor الرقم القومي ليطابق الباك اند)
     const columns = [
         { header: 'الاسم', accessor: 'name' },
         { header: 'رقم التليفون', accessor: 'phone' },
@@ -89,7 +86,6 @@ export default function Index({ customers = {}, filters = {} }) {
                         </Button>
                     </div>
 
-                    {/* تمرير الداتا الحقيقية من الباك اند */}
                     <Table 
                         columns={columns} 
                         data={customers?.data || []} 
@@ -107,6 +103,7 @@ export default function Index({ customers = {}, filters = {} }) {
             />
         </>
     );
+
 }
 
 Index.layout = (page) => <MainLayout>{page}</MainLayout>;
