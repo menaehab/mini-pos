@@ -5,6 +5,7 @@ export default function DeleteConfirmModal({
     onClose,
     onConfirm,
     userName,
+    entityName = "المستخدم",
     processing = false,
 }) {
     if (!isOpen) return null;
@@ -34,7 +35,7 @@ export default function DeleteConfirmModal({
                         تأكيد الحذف
                     </h2>
                     <p className="text-sm text-gray-500">
-                        هل أنت متأكد من حذف المستخدم
+                        هل أنت متأكد من حذف {entityName}
                         <span className="font-bold text-gray-700">
                             {' '}
                             "{userName}"

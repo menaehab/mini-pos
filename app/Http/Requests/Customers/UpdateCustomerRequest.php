@@ -24,7 +24,7 @@ class UpdateCustomerRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|regex:/^01(0|1|2|5)[0-9]{8}$/',
+            'phone' => ['nullable', 'regex:/^01[0125][0-9]{8}$/'],
             'address' => 'nullable|string|max:255',
             'national_number' => 'nullable|string|max:20',
         ];

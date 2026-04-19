@@ -48,7 +48,6 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
     Route::get('customers/{customer}', [CustomerController::class, 'show'])
         ->name('customers.show')
         ->middleware('permission:view_customers|manage_customers');
-
     // categories
     Route::get('categories', [CategoryController::class, 'index'])
         ->name('categories.index')

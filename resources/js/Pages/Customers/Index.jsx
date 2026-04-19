@@ -1,0 +1,183 @@
+import Button from '@/Components/Button';
+import CustomerModal from '@/Components/CustomerModal';
+import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
+import Table from '@/Components/Table';
+import { usePermissions } from '@/hooks/usePermissions';
+import useTranslation from '@/hooks/useTranslation';
+import MainLayout from '@/Layouts/MainLayout';
+import { Head, router } from '@inertiajs/react';
+import { Search } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
+export default function Index({ customers = {}, filters = {} }) {
+    const { __ } = useTranslation();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState(filters.search || '');
+    const [perPage, setPerPage] = useState(filters.per_page || '10');
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [customerToDelete, setCustomerToDelete] = useState(null);
+    const [deleteProcessing, setDeleteProcessing] = useState(false);
+
+    const isFirstRender = useRef(true);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        const delaySearch = setTimeout(() => {
+            router.get(
+                route('customers.index'),
+                { search: searchQuery, per_page: perPage },
+                { preserveState: true, preserveScroll: true, replace: true },
+            );
+        }, 400);
+        return () => clearTimeout(delaySearch);
+    }, [searchQuery, perPage]);
+    const { can } = usePermissions();
+    const handleDelete = (customer) => {
+        setCustomerToDelete(customer);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = () => {
+        setDeleteProcessing(true);
+        router.delete(route('customers.destroy', customerToDelete.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteModalOpen(false);
+                setCustomerToDelete(null);
+                setDeleteProcessing(false);
+            },
+            onError: () => setDeleteProcessing(false),
+        });
+    };
+
+    const handleEdit = (customer) => {
+        setSelectedCustomer(customer);
+        setIsModalOpen(true);
+    };
+
+    const openAddModal = () => {
+        setSelectedCustomer(null);
+        setIsModalOpen(true);
+    };
+
+    const handleView = (customer) => {
+        router.get(route('customers.show', customer.id));
+    };
+
+    const columns = [
+        { header: 'الاسم', accessor: 'name' },
+        { header: 'رقم التليفون', accessor: 'phone' },
+        { header: 'الرقم القومي', accessor: 'national_number' },
+        { header: 'العنوان', accessor: 'address' },
+        {
+            header: 'الرصيد',
+            accessor: 'balance',
+            render: (row) => (
+                <span className="inline-block rounded-full bg-black px-3 py-1 text-xs font-bold text-white">
+                    {row.balance || 0} جنيه
+                </span>
+            ),
+        },
+    ];
+
+    return (
+        <>
+            <Head title={__('keywords.customers')} />
+
+            <div className="relative mx-auto mb-8 max-w-6xl">
+                <div className="mb-8 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        {__('keywords.customers')}
+                    </h1>
+                </div>
+
+                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <div className="mb-6 flex w-full items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="relative w-72">
+                                <input
+                                    type="text"
+                                    placeholder={__('keywords.search')}
+                                    value={searchQuery}
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-gray-200 py-2 pl-10 pr-4 text-right focus:border-black focus:outline-none"
+                                    dir="rtl"
+                                />
+                                <Search
+                                    className="absolute left-3 top-2.5 text-gray-400"
+                                    size={18}
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">
+                                    {__('keywords.show')}
+                                </span>
+                                <select
+                                    value={perPage}
+                                    onChange={(e) => setPerPage(e.target.value)}
+                                    className="cursor-pointer appearance-none rounded-lg border border-gray-200 bg-none px-2 py-2 text-center focus:border-black focus:outline-none"
+                                    style={{ backgroundImage: 'none' }}
+                                    dir="ltr"
+                                >
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {can('manage_customers') && (
+                            <Button
+                                onClick={openAddModal}
+                                className="whitespace-nowrap rounded-lg bg-[#1a202c] px-6 hover:bg-black"
+                            >
+                                {__('keywords.add_customer')}
+                            </Button>
+                        )}
+                    </div>
+
+                    <Table
+                        columns={columns}
+                        data={customers?.data || []}
+                        pagination={customers}
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        canView={can('view_customers')}
+                        canEdit={can('manage_customers')}
+                        canDelete={can('manage_customers')}
+                    />
+                </div>
+            </div>
+
+            <CustomerModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                customer={selectedCustomer}
+            />
+
+            <DeleteConfirmModal
+                isOpen={deleteModalOpen}
+                onClose={() => {
+                    setDeleteModalOpen(false);
+                    setCustomerToDelete(null);
+                }}
+                onConfirm={confirmDelete}
+                userName={customerToDelete?.name}
+                entityName={__('keywords.customer')}
+                processing={deleteProcessing}
+            />
+        </>
+    );
+}
+
+Index.layout = (page) => <MainLayout>{page}</MainLayout>;
