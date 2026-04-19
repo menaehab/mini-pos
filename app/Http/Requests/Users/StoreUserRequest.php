@@ -34,13 +34,7 @@ class StoreUserRequest extends FormRequest
                 'unique:users,email',
             ],
 
-            'phone' => [
-                'required_without_all:email',
-                'nullable',
-                'string',
-                'unique:users,phone',
-                'regex:/^01(0|1|2|5)[0-9]{8}$/',
-            ],
+            'role' => ['nullable', 'string'],
 
             'password' => ['required', 'string', 'min:8', 'confirmed'],
 
