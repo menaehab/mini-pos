@@ -19,13 +19,15 @@ Route::middleware('auth')->group(function () {
 
     // suppliers
     Route::get('suppliers', [SupplierController::class, 'index'])
+        ->name('suppliers.index')
         ->middleware('permission:view_suppliers|manage_suppliers');
 
     Route::resource('suppliers', SupplierController::class)
-        ->except(['index'])
+        ->except(['index', 'show'])
         ->middleware('permission:manage_suppliers');
 
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])
+        ->name('suppliers.show')
         ->middleware('permission:view_suppliers');
 
     // customers
