@@ -11,7 +11,7 @@ class StoreSupplierPaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('create_supplier_payments') || auth()->user()->can('manage_supplier_payments');
+        return auth()->user()->can('add_supplier_payments') || auth()->user()->can('manage_supplier_payments');
     }
 
     /**

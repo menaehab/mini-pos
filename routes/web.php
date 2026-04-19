@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
@@ -167,15 +168,32 @@ Route::middleware('auth')->group(function () {
 
     Route::post('supplier-payments', [SupplierPaymentController::class, 'store'])
         ->name('supplier-payments.store')
-        ->middleware('permission:create_supplier_payments|manage_supplier_payments');
+        ->middleware('permission:add_supplier_payments|manage_supplier_payments');
 
     Route::put('supplier-payments/{supplierPayment}', [SupplierPaymentController::class, 'update'])
         ->name('supplier-payments.update')
-        ->middleware('permission:update_supplier_payments|manage_supplier_payments');
+        ->middleware('permission:edit_supplier_payments|manage_supplier_payments');
 
     Route::delete('supplier-payments/{supplierPayment}', [SupplierPaymentController::class, 'destroy'])
         ->name('supplier-payments.destroy')
         ->middleware('permission:manage_supplier_payments');
+
+    // customer payments
+    Route::get('customer-payments', [CustomerPaymentController::class, 'index'])
+        ->name('customer-payments.index')
+        ->middleware('permission:view_customer_payments|manage_customer_payments');
+
+    Route::post('customer-payments', [CustomerPaymentController::class, 'store'])
+        ->name('customer-payments.store')
+        ->middleware('permission:add_customer_payments|manage_customer_payments');
+
+    Route::put('customer-payments/{customerPayment}', [CustomerPaymentController::class, 'update'])
+        ->name('customer-payments.update')
+        ->middleware('permission:edit_customer_payments|manage_customer_payments');
+
+    Route::delete('customer-payments/{customerPayment}', [CustomerPaymentController::class, 'destroy'])
+        ->name('customer-payments.destroy')
+        ->middleware('permission:manage_customer_payments');
 
 });
 
