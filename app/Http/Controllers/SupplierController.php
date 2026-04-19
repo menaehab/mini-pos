@@ -33,6 +33,7 @@ class SupplierController extends Controller
         $data = $request->validated();
         $suppliers = Supplier::create([
             'name' => $data['name'],
+            'phone' => $data['phone'] ?? null,
         ]);
 
         return redirect()->route('suppliers.index')->with('success', __('keywords.created', ['name' => __('keywords.supplier')]));
@@ -52,6 +53,7 @@ class SupplierController extends Controller
 
         $supplier->update([
             'name' => $data['name'],
+            'phone' => $data['phone'] ?? null,
         ]);
 
         return redirect()->route('suppliers.index')->with('success', __('keywords.updated', ['name' => __('keywords.supplier')]));

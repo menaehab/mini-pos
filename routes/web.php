@@ -4,14 +4,11 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->name('dashboard.')->group(function () {
+Route::middleware('auth')->group(function () {
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -30,7 +27,7 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
         ->middleware('permission:view_suppliers|manage_suppliers');
 
     Route::resource('suppliers', SupplierController::class)
-        ->except(['index'])
+        ->except(['index', 'show'])
         ->middleware('permission:manage_suppliers');
 
     Route::get('suppliers/{supplier}', [SupplierController::class, 'show'])
@@ -49,6 +46,7 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
     Route::get('customers/{customer}', [CustomerController::class, 'show'])
         ->name('customers.show')
         ->middleware('permission:view_customers|manage_customers');
+
     // categories
     Route::get('categories', [CategoryController::class, 'index'])
         ->name('categories.index')
@@ -76,9 +74,8 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
         ->middleware('permission:view_products|manage_products');
 
     // purchases
-
     Route::get('purchases/get-purchase/{number}', [PurchaseController::class, 'getPurchase'])
-        ->name('purchases.get_purchase')
+        ->name('purchases.get-purchase')
         ->middleware('permission:view_purchases|manage_purchases');
 
     Route::get('purchases', [PurchaseController::class, 'index'])
@@ -111,34 +108,38 @@ Route::middleware('auth')->name('dashboard.')->group(function () {
 
     // purchase returns
     Route::get('purchase-returns', [PurchaseReturnController::class, 'index'])
-        ->name('purchase_returns.index')
+        ->name('purchase-returns.index')
         ->middleware('permission:view_purchases|manage_purchases');
 
     Route::post('purchase-returns', [PurchaseReturnController::class, 'store'])
-        ->name('purchase_returns.store')
+        ->name('purchase-returns.store')
         ->middleware('permission:edit_purchases|manage_purchases');
 
     Route::put('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'update'])
-        ->name('purchase_returns.update')
+        ->name('purchase-returns.update')
         ->middleware('permission:edit_purchases|manage_purchases');
 
     Route::delete('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'destroy'])
-        ->name('purchase_returns.destroy')
+        ->name('purchase-returns.destroy')
         ->middleware('permission:manage_purchases');
 
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])
-        ->name('supplier_payments.index')
+        ->name('supplier-payments.index')
         ->middleware('permission:view_supplier_payments|manage_supplier_payments');
+
     Route::post('supplier-payments', [SupplierPaymentController::class, 'store'])
-        ->name('supplier_payments.store')
+        ->name('supplier-payments.store')
         ->middleware('permission:create_supplier_payments|manage_supplier_payments');
+
     Route::put('supplier-payments/{supplierPayment}', [SupplierPaymentController::class, 'update'])
-        ->name('supplier_payments.update')
+        ->name('supplier-payments.update')
         ->middleware('permission:update_supplier_payments|manage_supplier_payments');
+
     Route::delete('supplier-payments/{supplierPayment}', [SupplierPaymentController::class, 'destroy'])
-        ->name('supplier_payments.destroy')
+        ->name('supplier-payments.destroy')
         ->middleware('permission:manage_supplier_payments');
 
 });
+
 require __DIR__.'/auth.php';

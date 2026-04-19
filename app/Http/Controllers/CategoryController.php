@@ -22,7 +22,7 @@ class CategoryController extends Controller
             ->paginate($data['per_page'] ?? 10)
             ->withQueryString();
 
-        return Inertia::render('categories/Index', [
+        return Inertia::render('Categories/Index', [
             'categories' => $categories,
             'filters' => [
                 'search' => $data['search'] ?? null,
