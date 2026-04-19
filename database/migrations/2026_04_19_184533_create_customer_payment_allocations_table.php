@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('supplier_payments', function (Blueprint $table) {
+        Schema::create('customer_payment_allocations', function (Blueprint $table) {
             $table->id();
-            $table->decimal('amount', 10, 2);
-            $table->text('note')->nullable();
-            $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnUpdate();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate();
+            $table->boolean('is_first_payment')->default(false);
+            $table->foreignId('customer_payment_id')->constrained('customer_payments')->cascadeOnDelete();
+            $table->foreignId('sale_id')->constrained('sales')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supplier_payments');
+        Schema::dropIfExists('customer_payment_allocations');
     }
 };

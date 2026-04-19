@@ -81,4 +81,6 @@ return [
     'supplier_payment' => 'مدفوعات الموردين',
     'to_purchase_first' => 'لإضافته إلى هذه الشراء',
     'return_quantity_exceeds_remaining' => 'كمية الإرجاع للمنتج :item تتجاوز الكمية المتبقية :remaining',
+    'cash' => 'كاش',
+    'installment' => 'قسط',
 ];
