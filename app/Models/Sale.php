@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Sale extends Model
 {
     protected $fillable = [
-        'customer_id',
-        'total_amount',
-        'paid_amount',
-        'due_amount',
+        'total_price',
         'note',
+        'type',
+        'customer_name',
+        'installment_months',
+        'installment_amount',
+        'installment_rate',
+        'customer_id',
+        'user_id',
     ];
 
     public function customer()

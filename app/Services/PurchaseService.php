@@ -82,7 +82,6 @@ class PurchaseService
         $payment = SupplierPayment::create([
             'supplier_id' => $supplierId,
             'amount' => $amount,
-            'is_first_payment' => true,
         ]);
 
         $purchase->supplierPaymentAllocations()->create([
