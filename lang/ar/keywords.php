@@ -76,4 +76,6 @@ return [
     'view_categories' => 'عرض الفئات',
     'manage_products' => 'إدارة المنتجات',
     'view_products' => 'عرض المنتجات',
+    'view_supplier_payments' => 'عرض مدفوعات الموردين',
+    'supplier_payment' => 'مدفوعات الموردين',
 ];
