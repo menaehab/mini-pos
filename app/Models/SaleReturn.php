@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Observers\SaleReturnObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy(SaleReturnObserver::class)]
 class SaleReturn extends Model
 {
     protected $fillable = [
@@ -23,5 +26,10 @@ class SaleReturn extends Model
     public function items()
     {
         return $this->hasMany(SaleReturnItem::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

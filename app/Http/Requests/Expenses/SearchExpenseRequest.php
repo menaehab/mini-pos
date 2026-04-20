@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Http\Requests\SaleReturns;
+namespace App\Http\Requests\Expenses;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class SearchSaleReturnRequest extends FormRequest
+class SearchExpenseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('view_sale_returns') || auth()->user()->can('manage_sale_returns');
+        return auth()->user()->can('view_expenses') || auth()->user()->can('manage_expenses') || auth()->user()->can('add_expenses');
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, array<int, string>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             'search' => ['nullable', 'string', 'max:255'],
-            'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
-            'per_page' => ['nullable', 'integer', 'in:10,25,50,100'],
+            'per_page' => ['nullable', 'integer', 'between:1,100'],
         ];
     }
 }
