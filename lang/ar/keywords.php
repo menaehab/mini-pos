@@ -210,4 +210,12 @@ return [
     'add_purchases' => 'إضافة مشتريات',
     'view_purchases' => 'عرض المشتريات',
     'manage_purchases' => 'إدارة المشتريات',
+
+    // إذن التوريد
+    'supply_receipts' => 'اذن التوريد',
+    'payment_method' => 'وسيلة الدفع',
+    'amount' => 'المبلغ',
+    'cash' => 'نقدي',
+    'visa' => 'فيزا',
+    'bank_transfer' => 'تحويل بنكي',
 ];

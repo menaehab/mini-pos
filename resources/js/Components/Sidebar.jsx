@@ -35,6 +35,12 @@ const menuItems = [
         requiredPermissions: ['view_customers', 'manage_customers'],
     },
     {
+        name: 'اذن التوريد',
+        icon: `${ICONS_PATH}/streamline_payment-10.svg`,
+        route: 'customer-payments.index',
+        requiredPermissions: ['view_customer_payments', 'manage_customer_payments'],
+    },
+    {
         name: 'المبيعات',
         icon: '/Solve X/lsicon_sales-return-outline.svg',
         route: 'sales.index',
