@@ -17,8 +17,8 @@ export default function Home({ categories, products: initialProducts }) {
     const [cart, setCart] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+    const [mobileTab, setMobileTab] = useState('products');
 
-    // Fetch products when category or search changes
     useEffect(() => {
         const fetchProducts = async () => {
             setIsLoading(true);
@@ -85,11 +85,44 @@ export default function Home({ categories, products: initialProducts }) {
             <Head title={__('keywords.pos')} />
 
             <div
-                className="relative mx-auto flex h-[calc(100vh-100px)] max-w-full flex-col gap-6 overflow-hidden p-4 font-['Cairo'] lg:flex-row"
+                className="relative mx-auto flex h-[calc(100vh-100px)] max-w-full flex-col gap-3 overflow-hidden p-4 font-['Cairo'] lg:flex-row lg:gap-6"
                 dir="rtl"
             >
+                {/* Mobile Tab Switcher */}
+                <div className="flex gap-1 p-1 bg-gray-100 shrink-0 rounded-2xl lg:hidden">
+                    <button
+                        onClick={() => setMobileTab('products')}
+                        className={`flex-1 rounded-xl py-3 text-sm font-bold transition-all ${
+                            mobileTab === 'products'
+                                ? 'bg-white text-black shadow-sm'
+                                : 'text-gray-500'
+                        }`}
+                    >
+                        {__('keywords.products')}
+                    </button>
+                    <button
+                        onClick={() => setMobileTab('cart')}
+                        className={`relative flex-1 rounded-xl py-3 text-sm font-bold transition-all ${
+                            mobileTab === 'cart'
+                                ? 'bg-white text-black shadow-sm'
+                                : 'text-gray-500'
+                        }`}
+                    >
+                        {__('keywords.shopping_cart')}
+                        {cart.length > 0 && (
+                            <span className="absolute left-2 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-black text-white">
+                                {cart.length}
+                            </span>
+                        )}
+                    </button>
+                </div>
+
                 {/* Main Content: Products */}
-                <div className="flex flex-1 flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm">
+                <div
+                    className={`flex-1 flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm ${
+                        mobileTab === 'cart' ? 'hidden lg:flex' : 'flex'
+                    }`}
+                >
                     {/* Header: Search & Filter */}
                     <div className="flex flex-col gap-4 mb-6">
                         {/* Search */}
@@ -168,7 +201,13 @@ export default function Home({ categories, products: initialProducts }) {
                 </div>
 
                 {/* Sidebar: Cart */}
-                <div className="flex h-full w-full flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-lg lg:w-[400px]">
+                <div
+                    className={`flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-lg lg:flex lg:w-[400px] ${
+                        mobileTab === 'products'
+                            ? 'hidden lg:flex'
+                            : 'flex h-full'
+                    }`}
+                >
                     <div className="flex items-center justify-between p-6 border-b border-gray-50">
                         <h2 className="text-xl font-black text-gray-800">
                             {__('keywords.shopping_cart')}
