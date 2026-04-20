@@ -18,7 +18,7 @@ export default function Index({ purchases = {}, filters = {} }) {
     const [purchaseToDelete, setPurchaseToDelete] = useState(null);
     const [deleteProcessing, setDeleteProcessing] = useState(false);
 
-    // مودال السداد للمورد
+  
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [purchaseToPay, setPurchaseToPay] = useState(null);
 
@@ -70,7 +70,7 @@ export default function Index({ purchases = {}, filters = {} }) {
         setIsPaymentModalOpen(true);
     };
 
-    // تعريف الأعمدة (نفس المبيعات بس للموردين)
+
     const columns = [
         { header: __('keywords.invoice_number'), accessor: 'invoice_number' },
         { 
