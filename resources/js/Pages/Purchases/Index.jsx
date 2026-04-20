@@ -18,7 +18,7 @@ export default function Index({ purchases = {}, filters = {} }) {
     const [purchaseToDelete, setPurchaseToDelete] = useState(null);
     const [deleteProcessing, setDeleteProcessing] = useState(false);
 
-  
+
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [purchaseToPay, setPurchaseToPay] = useState(null);
 

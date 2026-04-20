@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import Table from '@/Components/Table';
 import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
-import { Search, RotateCcw } from 'lucide-react';
+import { Search, RotateCcw } from 'lucide-react'; // استخدمنا أيقونة الإرجاع
 import { Head, router } from '@inertiajs/react';
 import useTranslation from '@/hooks/useTranslation';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -27,7 +27,7 @@ export default function Index({ returns = {}, filters = {} }) {
         }
         const delaySearch = setTimeout(() => {
             router.get(
-                route('purchases-returns.index'), // تأكد إن ده اسم الراوت بتاعك
+                route('sales-returns.index'), // تأكد إن ده اسم الراوت بتاعك
                 { search: searchQuery, per_page: perPage }, 
                 { preserveState: true, preserveScroll: true, replace: true }
             );
@@ -42,7 +42,7 @@ export default function Index({ returns = {}, filters = {} }) {
 
     const confirmDelete = () => {
         setDeleteProcessing(true);
-        router.delete(route('purchases-returns.destroy', returnToDelete.id), {
+        router.delete(route('sales-returns.destroy', returnToDelete.id), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeleteModalOpen(false);
@@ -54,34 +54,33 @@ export default function Index({ returns = {}, filters = {} }) {
     };
 
     const handleEdit = (item) => {
-        router.get(route('purchases-returns.edit', item.id));
+        router.get(route('sales-returns.edit', item.id));
     };
 
     const handleView = (item) => {
-        router.get(route('purchases-returns.show', item.id));
+        router.get(route('sales-returns.show', item.id));
     };
 
-    // تعريف الأعمدة لجدول مرتجعات المشتريات
+    // تعريف الأعمدة لجدول المرتجعات
     const columns = [
-        { header: __('keywords.return_number') || 'رقم المرتجع', accessor: 'return_number' },
+        { header: __('keywords.return_number'), accessor: 'return_number' },
         { 
-            header: __('keywords.original_purchase_invoice') || 'رقم فاتورة الشراء', 
-            accessor: 'purchase',
-            render: (row) => <span className="font-bold text-gray-600">{row.purchase?.invoice_number || '—'}</span> 
+            header: __('keywords.original_invoice'), 
+            accessor: 'sale',
+            render: (row) => <span className="font-bold text-gray-600">{row.sale?.invoice_number || '—'}</span> 
         },
         { 
-            header: __('keywords.supplier') || 'المورد', 
-            accessor: 'supplier',
-            render: (row) => <span className="font-bold text-gray-800">{row.supplier?.name || __('keywords.cash_supplier')}</span> 
+            header: __('keywords.customer'), 
+            accessor: 'customer',
+            render: (row) => <span className="font-bold text-gray-800">{row.customer?.name || __('keywords.cash_customer')}</span> 
         },
         { 
-            header: __('keywords.total_returned') || 'إجمالي المرتجع', 
+            header: __('keywords.total_returned'), 
             accessor: 'total_returned',
-            // خليناها هنا باللون الأخضر لأن دي فلوس راجعة لينا أو ديون بتسقط من علينا
-            render: (row) => <span className="font-bold text-green-600">{row.total_returned || 0} ج.م</span>
+            render: (row) => <span className="font-bold text-red-600">{row.total_returned || 0} ج.م</span>
         },
         { 
-            header: __('keywords.status') || 'الحالة', 
+            header: __('keywords.status'), 
             accessor: 'status',
             render: (row) => {
                 let badgeClass = "bg-gray-100 text-gray-700 border-gray-200";
@@ -90,10 +89,10 @@ export default function Index({ returns = {}, filters = {} }) {
                 // حالات المرتجع (مكتمل أو قيد الانتظار)
                 if (row.status === 'completed') {
                     badgeClass = "bg-green-100 text-green-700 border-green-200";
-                    statusText = __('keywords.completed_status') || 'مكتمل';
+                    statusText = __('keywords.completed_status');
                 } else if (row.status === 'pending') {
                     badgeClass = "bg-yellow-100 text-yellow-700 border-yellow-200";
-                    statusText = __('keywords.pending_status') || 'قيد الانتظار';
+                    statusText = __('keywords.pending_status');
                 }
 
                 return (
@@ -104,7 +103,7 @@ export default function Index({ returns = {}, filters = {} }) {
             }
         },
         { 
-            header: __('keywords.return_date') || 'تاريخ المرتجع', 
+            header: __('keywords.return_date'), 
             accessor: 'created_at',
             render: (row) => (
                 <span dir="ltr" className="text-sm text-gray-600">
@@ -116,12 +115,12 @@ export default function Index({ returns = {}, filters = {} }) {
 
     return (
         <>
-            <Head title={__('keywords.purchases_returns') || 'مرتجعات المشتريات'} />
+            <Head title={__('keywords.sales_returns')} />
             
             <div className="relative mx-auto mb-8 max-w-7xl font-['Cairo']" dir="rtl">
                 <div className="mb-8 flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-800">
-                        {__('keywords.purchases_returns') || 'مرتجعات المشتريات'}
+                        {__('keywords.sales_returns')}
                     </h1>
                 </div>
 
@@ -132,7 +131,7 @@ export default function Index({ returns = {}, filters = {} }) {
                             <div className="relative w-72">
                                 <input
                                     type="text"
-                                    placeholder={__('keywords.search') || 'بحث...'}
+                                    placeholder={__('keywords.search')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full rounded-lg border border-gray-200 py-2 pr-10 pl-4 text-right focus:border-black focus:outline-none"
@@ -141,7 +140,7 @@ export default function Index({ returns = {}, filters = {} }) {
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500">{__('keywords.show') || 'عرض'}</span>
+                                <span className="text-sm text-gray-500">{__('keywords.show')}</span>
                                 <select
                                     value={perPage}
                                     onChange={(e) => setPerPage(e.target.value)}
@@ -155,13 +154,13 @@ export default function Index({ returns = {}, filters = {} }) {
                             </div>
                         </div>
 
-                        {can('manage_purchases_returns') && (
+                        {can('manage_sales_returns') && (
                             <button 
-                                onClick={() => router.get(route('purchases-returns.create'))} 
+                                onClick={() => router.get(route('sales-returns.create'))} 
                                 className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-red-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-red-700 min-w-[130px] transition-colors shadow-md"
                             >
                                 <RotateCcw size={16} />
-                                {__('keywords.add_purchase_return') || 'إضافة مرتجع مشتريات'}
+                                {__('keywords.add_return')}
                             </button>
                         )}
                     </div>
@@ -173,9 +172,9 @@ export default function Index({ returns = {}, filters = {} }) {
                         onView={handleView} 
                         onEdit={handleEdit} 
                         onDelete={handleDelete} 
-                        canView={can('view_purchases_returns')}
-                        canEdit={can('manage_purchases_returns')}
-                        canDelete={can('manage_purchases_returns')}
+                        canView={can('view_sales_returns')}
+                        canEdit={can('manage_sales_returns')}
+                        canDelete={can('manage_sales_returns')}
                     />
                 </div>
             </div>
@@ -188,7 +187,7 @@ export default function Index({ returns = {}, filters = {} }) {
                 }}
                 onConfirm={confirmDelete}
                 userName={returnToDelete?.return_number}
-                entityName={__('keywords.return_number') || 'رقم المرتجع'}
+                entityName={__('keywords.return_number')}
                 processing={deleteProcessing}
             />
         </>

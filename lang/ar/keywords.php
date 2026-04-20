@@ -131,4 +131,19 @@ return [
     'add_purchase' => 'إضافة فاتورة شراء',
     'supplier' => 'المورد',
     'cash_supplier' => 'مورد نقدي', 
+
+    // مرتجعات المبيعات
+    'sales_returns' => 'مرتجعات المبيعات',
+    'add_return' => 'إضافة مرتجع جديد',
+    'return_number' => 'رقم المرتجع',
+    'original_invoice' => 'رقم فاتورة البيع',
+    'total_returned' => 'إجمالي المرتجع',
+    'return_date' => 'تاريخ المرتجع',
+    'completed_status' => 'مكتمل',
+    'pending_status' => 'قيد الانتظار',
+
+    // مرتجعات المشتريات
+    'purchases_returns' => 'مرتجعات المشتريات',
+    'add_purchase_return' => 'إضافة مرتجع مشتريات',
+    'original_purchase_invoice' => 'رقم فاتورة الشراء',
 ];
