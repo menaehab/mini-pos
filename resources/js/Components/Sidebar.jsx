@@ -34,6 +34,18 @@ const menuItems = [
         route: 'customers.index',
         requiredPermissions: ['view_customers', 'manage_customers'],
     },
+    {
+        name: 'المبيعات',
+        icon: '/Solve X/lsicon_sales-return-outline.svg',
+        route: 'sales.index',
+        requiredPermissions: ['view_sales', 'manage_sales'],
+    },
+    {
+        name: 'المشتريات',
+        icon: '/Solve X/tdesign_money.svg',
+        route: 'purchases.index',
+        requiredPermissions: ['view_purchases', 'manage_purchases'],
+    },
 ];
 
 export default function Sidebar({ isOpen, onClose = () => {} }) {

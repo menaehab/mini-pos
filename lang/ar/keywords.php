@@ -110,4 +110,25 @@ return [
     'amount_due' => 'المطلوب سداده',
     'pay' => 'سدد',
     'currency' => 'ج.م',
+
+    // sales
+    'sales' => 'المبيعات',
+    'invoice_number' => 'رقم الفاتورة',
+    'total' => 'الإجمالي',
+    'paid' => 'المدفوع',
+    'remaining' => 'المتبقي',
+    'status' => 'الحالة',
+    'created_date' => 'تاريخ الإنشاء',
+    'payment' => 'السداد',
+    'paid_status' => 'مدفوعة',
+    'unpaid_status' => 'غير مدفوعة',
+    'partial_status' => 'مدفوعة جزئياً',
+    'cash_customer' => 'عميل نقدي (طياري)',
+    'add_invoice' => 'إضافة فاتورة',
+
+    // المشتريات 
+    'purchases' => 'المشتريات',
+    'add_purchase' => 'إضافة فاتورة شراء',
+    'supplier' => 'المورد',
+    'cash_supplier' => 'مورد نقدي', 
 ];
