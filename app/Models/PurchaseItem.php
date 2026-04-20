@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'purchase_id',
+    'product_id',
     'item_name',
     'quantity',
     'purchase_price',

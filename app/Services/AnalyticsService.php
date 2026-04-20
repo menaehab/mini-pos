@@ -91,24 +91,15 @@ class AnalyticsService
     private function getLowStockProducts(int $threshold)
     {
         return Product::query()
-            ->withSum('purchaseItems as purchased_qty', 'quantity')
-            ->withSum('saleItems as sold_qty', 'quantity')
-            ->withSum('purchaseReturnItems as purchase_returned_qty', 'quantity')
-            ->withSum('saleReturnItems as sale_returned_qty', 'quantity')
+            ->where('stock', '<=', $threshold)
+            ->orderBy('stock')
+            ->limit(10)
             ->get()
             ->map(function (Product $product) {
-                $product->current_stock =
-                    ($product->purchased_qty ?? 0)
-                    + ($product->sale_returned_qty ?? 0)
-                    - ($product->sold_qty ?? 0)
-                    - ($product->purchase_returned_qty ?? 0);
+                $product->current_stock = $product->stock;
 
                 return $product;
-            })
-            ->filter(fn (Product $p) => $p->current_stock <= $threshold)
-            ->sortBy('current_stock')
-            ->take(10)
-            ->values();
+            });
     }
 
     // ─── Customers

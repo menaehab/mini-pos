@@ -58,7 +58,7 @@ class PurchaseService
         foreach ($items as $item) {
             $purchase->items()->create($item);
 
-            Product::where('id', $item['item_id'])
+            Product::where('id', $item['product_id'])
                 ->increment('stock', $item['quantity']);
         }
     }
@@ -66,7 +66,7 @@ class PurchaseService
     private function rollbackStock($purchase)
     {
         foreach ($purchase->items as $item) {
-            Product::where('id', $item->item_id)
+            Product::where('id', $item->product_id)
                 ->decrement('stock', $item->quantity);
         }
     }
