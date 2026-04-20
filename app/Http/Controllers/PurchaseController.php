@@ -12,108 +12,100 @@ class PurchaseController extends Controller
 {
     public function __construct(public PurchaseService $purchaseService) {}
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(SearchPurchaseRequest $request)
     {
-        $data = $request->validated();
+        // استقبال الفلاتر بأسماء الفرونت إند
+        $search = $request->input('search');
+        $paymentMethod = $request->input('payment_method');
+        $status = $request->input('status'); // لو عندك حالة
+        $date = $request->input('date');
 
         $purchases = Purchase::with('supplier')
-            ->when($data['number'] ?? null, function ($query, $number) {
-                $query->where('number', 'like', "%$number%");
+            ->when($search, function ($query, $search) {
+                // بحث برقم الفاتورة أو اسم المورد
+                $query->where('invoice_number', 'like', "%$search%")
+                      ->orWhereHas('supplier', function ($q) use ($search) {
+                          $q->where('name', 'like', "%$search%");
+                      });
             })
-            ->when($data['supplier_name'] ?? null, function ($query, $supplierName) {
-                $query->where('supplier_name', 'like', "%$supplierName%");
+            ->when($paymentMethod, function ($query, $paymentMethod) {
+                $query->where('payment_method', $paymentMethod);
             })
-            ->when($data['payment_type'] ?? null, function ($query, $paymentType) {
-                $query->where('payment_type', $paymentType);
+            ->when($date, function ($query, $date) {
+                $query->whereDate('created_at', $date);
             })
             ->latest()
-            ->paginate($data['per_page'] ?? 10)->withQueryString();
+            ->paginate($request->input('per_page', 10))
+            ->withQueryString();
 
         return inertia('Purchases/Index', [
             'purchases' => $purchases,
-            'filters' => $data,
+            'filters' => $request->all(),
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return inertia('Purchases/Create');
+        // هنبعت الموردين والمنتجات للفرونت عشان يختار منها
+        $suppliers = \App\Models\Supplier::select('id', 'name')->get();
+        $products = \App\Models\Product::select('id', 'name', 'stock')->get();
+
+        return inertia('Purchases/Create', [
+            'suppliers' => $suppliers,
+            'products' => $products,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StorePurchaseRequest $request)
     {
         $data = $request->validated();
-
         $data['user_id'] = auth()->id();
 
-        $purchase = $this->purchaseService->createPurchase($data);
+        // اتعدلت لـ create بدل createPurchase
+        $purchase = $this->purchaseService->create($data); 
 
-        return redirect()->route('purchases.index', $purchase)
+        return redirect()->route('purchases.index')
             ->with('success', __('keywords.created', ['name' => __('keywords.purchase')]));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Purchase $purchase)
     {
-        $purchase->load('supplier', 'items', 'firstPayment');
+        $purchase->load('supplier', 'items.product', 'firstPayment');
 
         return inertia('Purchases/Show', [
             'purchase' => $purchase,
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Purchase $purchase)
     {
-        $purchase->load('supplier', 'items');
+        $purchase->load('supplier', 'items.product');
+        $suppliers = \App\Models\Supplier::select('id', 'name')->get();
+        $products = \App\Models\Product::select('id', 'name', 'stock')->get();
 
         return inertia('Purchases/Edit', [
             'purchase' => $purchase,
+            'suppliers' => $suppliers,
+            'products' => $products,
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
         $data = $request->validated();
+        
+        $this->purchaseService->update($purchase, $data);
 
-        $purchase = $this->purchaseService->update($purchase, $data);
-
-        return redirect()->route('purchases.index', $purchase)
+        return redirect()->route('purchases.index')
             ->with('success', __('keywords.updated', ['name' => __('keywords.purchase')]));
-
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Purchase $purchase)
     {
-        $purchase->delete();
+        // استدعاء دالة الحذف الآمنة من السيرفيس عشان نرجع المخزون
+        $this->purchaseService->delete($purchase);
 
         return redirect()->route('purchases.index')
             ->with('success', __('keywords.deleted', ['name' => __('keywords.purchase')]));
-    }
-
-    public function getPurchase($number)
-    {
-        $purchase = Purchase::where('number', $number)->first();
-
-        return $purchase->load('supplier', 'items');
     }
 }
