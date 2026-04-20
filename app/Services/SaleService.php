@@ -14,13 +14,15 @@ class SaleService
     public function create(array $data): Sale
     {
         return DB::transaction(function () use ($data) {
-            $this->validateStock($data['items']);
+            $items = $this->normalizeItemsWithProductData($data['items']);
+
+            $this->validateStock($items);
             $data['total_price'] = 0; // Will be updated after items are synced
             $sale = Sale::create($data);
 
-            $this->syncItems($sale, $data['items']);
+            $this->syncItems($sale, $items);
 
-            $totalPrice = $this->calculateTotal($data['items']);
+            $totalPrice = $this->calculateTotal($items);
 
             $monthlyInstallment = $this->calculateMonthlyInstallment(
                 $data['type'],
@@ -48,11 +50,13 @@ class SaleService
 
             $sale->items()->delete();
 
-            $this->validateStock($data['items']);
+            $items = $this->normalizeItemsWithProductData($data['items']);
 
-            $this->syncItems($sale, $data['items']);
+            $this->validateStock($items);
 
-            $totalPrice = $this->calculateTotal($data['items']);
+            $this->syncItems($sale, $items);
+
+            $totalPrice = $this->calculateTotal($items);
 
             $monthlyInstallment = $this->calculateMonthlyInstallment(
                 $data['type'],
@@ -73,7 +77,7 @@ class SaleService
                 'installment_amount' => $monthlyInstallment,
             ]);
 
-            optional($sale->firstPayment)->delete();
+            $this->deleteOldFirstPayments($sale);
 
             $this->createPayment($sale, $data['customer_id'], $data['down_payment'] ?? $totalPrice);
 
@@ -128,6 +132,47 @@ class SaleService
     }
 
     /**
+     * Build sale items from trusted product data and requested quantities only.
+     *
+     * @param  array<int, array{product_id: int, quantity: int}>  $items
+     * @return array<int, array{product_id: int, product_name: string, quantity: int, sale_price: float, purchase_price: float}>
+     */
+    private function normalizeItemsWithProductData(array $items): array
+    {
+        $productIds = collect($items)
+            ->pluck('product_id')
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $products = Product::query()
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
+        return collect($items)
+            ->map(function ($item) use ($products) {
+                $productId = (int) $item['product_id'];
+                $product = $products->get($productId);
+
+                if (! $product) {
+                    throw ValidationException::withMessages([
+                        'items' => __('validation.exists', ['attribute' => 'items']),
+                    ]);
+                }
+
+                return [
+                    'product_id' => $productId,
+                    'product_name' => $product->name,
+                    'quantity' => (int) $item['quantity'],
+                    'sale_price' => (float) $product->sale_price,
+                    'purchase_price' => (float) $product->purchase_price,
+                ];
+            })
+            ->all();
+    }
+
+    /**
      * Calculate the monthly installment amount.
      *
      * Formula:
@@ -164,5 +209,28 @@ class SaleService
             'customer_payment_id' => $payment->id,
             'is_first_payment' => true,
         ]);
+    }
+
+    private function deleteOldFirstPayments(Sale $sale): void
+    {
+        $oldFirstPaymentAllocations = $sale->paymentAllocations()
+            ->where('is_first_payment', true)
+            ->with('customerPayment')
+            ->get();
+
+        if ($oldFirstPaymentAllocations->isEmpty()) {
+            return;
+        }
+
+        // Delete linked payments first so allocations are removed by FK cascade.
+        foreach ($oldFirstPaymentAllocations as $allocation) {
+            if ($allocation->customerPayment) {
+                $allocation->customerPayment->delete();
+
+                continue;
+            }
+
+            $allocation->delete();
+        }
     }
 }

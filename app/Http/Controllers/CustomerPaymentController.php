@@ -6,7 +6,9 @@ use App\Http\Requests\CustomerPayments\SeachCustomerPaymentRequest;
 use App\Http\Requests\CustomerPayments\StoreCustomerPaymentRequest;
 use App\Http\Requests\CustomerPayments\UpdateCustomerPaymentRequest;
 use App\Models\CustomerPayment;
+use App\Models\Sale;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class CustomerPaymentController extends Controller
 {
@@ -49,12 +51,42 @@ class CustomerPaymentController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($data) {
-            CustomerPayment::create([
+            if (! empty($data['sale_id'])) {
+                $sale = Sale::query()
+                    ->withSum('payments as paid_amount', 'amount')
+                    ->findOrFail($data['sale_id']);
+
+                if ((int) $sale->customer_id !== (int) $data['customer_id']) {
+                    throw ValidationException::withMessages([
+                        'customer_id' => __('validation.exists', ['attribute' => 'customer_id']),
+                    ]);
+                }
+
+                $remaining = (float) $sale->remaining;
+
+                if ((float) $data['amount'] > $remaining) {
+                    throw ValidationException::withMessages([
+                        'amount' => __('validation.max.numeric', [
+                            'attribute' => 'amount',
+                            'max' => $remaining,
+                        ]),
+                    ]);
+                }
+            }
+
+            $payment = CustomerPayment::create([
                 'amount' => $data['amount'],
                 'note' => $data['note'] ?? null,
                 'customer_id' => $data['customer_id'],
                 'user_id' => auth()->id(),
             ]);
+
+            if (! empty($data['sale_id'])) {
+                $payment->allocations()->create([
+                    'sale_id' => $data['sale_id'],
+                    'is_first_payment' => false,
+                ]);
+            }
         });
 
         return back()->with('success', __('keywords.created', ['name' => 'customer_payment']));

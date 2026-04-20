@@ -20,6 +20,7 @@ class SaleController extends Controller
         $data = $request->validated();
 
         $sales = Sale::with('customer')
+            ->withSum('payments as paid_amount', 'amount')
             ->when($data['search'] ?? null, function ($query, $search) {
                 $query->where('customer_name', 'like', "%$search%");
             })
@@ -58,7 +59,8 @@ class SaleController extends Controller
      */
     public function show(Sale $sale)
     {
-        $sale->load('customer', 'items', 'paymentAllocations.customerPayment');
+        $sale->load('customer', 'items', 'paymentAllocations.customerPayment')
+            ->loadSum('payments as paid_amount', 'amount');
 
         return inertia('Sales/Show', [
             'sale' => $sale,
@@ -70,7 +72,7 @@ class SaleController extends Controller
      */
     public function edit(Sale $sale)
     {
-        $sale->load('customer', 'items');
+        $sale->load('customer', 'items')->loadSum('payments as paid_amount', 'amount');
 
         return inertia('Sales/Edit', [
             'sale' => $sale,
@@ -105,6 +107,6 @@ class SaleController extends Controller
     {
         $sale = Sale::findOrFail($id);
 
-        return $sale->load('customer', 'items');
+        return $sale->load('customer', 'items')->loadSum('payments as paid_amount', 'amount');
     }
 }
