@@ -97,8 +97,9 @@ class SaleReturnController extends Controller
      */
     public function destroy(SaleReturn $saleReturn)
     {
-        $saleReturn->delete();
+        $this->saleReturnService->delete($saleReturn);
 
-        return back()->with('success', __('keywords.deleted', ['name' => 'sale_return']));
+        return redirect()->route('sales-returns.index')
+            ->with('success', __('keywords.deleted', ['name' => 'sale_return']));
     }
 }

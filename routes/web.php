@@ -207,6 +207,10 @@ Route::middleware('auth')->group(function () {
         ->name('sale-returns.destroy')
         ->middleware('permission:manage_sale_returns');
 
+        Route::resource('sale-returns', SaleReturnController::class);
+
+        Route::resource('sales-returns', SaleReturnController::class);
+
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])
         ->name('supplier-payments.index')
