@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[ObservedBy(SaleObserver::class)]
 class Sale extends Model
@@ -40,6 +41,11 @@ class Sale extends Model
     public function paymentAllocations()
     {
         return $this->hasMany(CustomerPaymentAllocation::class);
+    }
+
+    public function firstPayment(): HasOne
+    {
+        return $this->hasOne(CustomerPaymentAllocation::class)->where('is_first_payment', true);
     }
 
     /**

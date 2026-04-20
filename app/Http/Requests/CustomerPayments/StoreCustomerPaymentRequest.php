@@ -25,6 +25,7 @@ class StoreCustomerPaymentRequest extends FormRequest
             'amount' => ['required', 'numeric', 'min:0.01'],
             'note' => ['nullable', 'string'],
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'sale_id' => ['nullable', 'integer', 'exists:sales,id'],
         ];
     }
 }
