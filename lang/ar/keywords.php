@@ -101,4 +101,5 @@ return [
     'installment' => 'قسط',
     'expense' => 'مصروف',
     'expenses' => 'مصروفات',
+    'view_dashboard' => 'عرض لوحة التحكم',
 ];

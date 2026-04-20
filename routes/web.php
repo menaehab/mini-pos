@@ -3,7 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [DashboardController::class, 'index'])->name('home');
 
     // users
     Route::get('users', [UserController::class, 'index'])
@@ -215,6 +215,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('customer-payments/{customerPayment}', [CustomerPaymentController::class, 'destroy'])
         ->name('customer-payments.destroy')
         ->middleware('permission:manage_customer_payments');
+
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('permission:view_dashboard');
 
 });
 
