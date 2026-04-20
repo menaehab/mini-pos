@@ -6,7 +6,7 @@ return [
     'deleted' => 'تم الحذف بنجاح',
     'user' => 'المستخدم',
     'users' => 'المستخدمين',
-
+    'price' => 'السعر',
     // Login
     'welcome_back' => 'نورتنا تاني',
     'we_are_happy_to_see_you' => 'رجوعك فرحنا',

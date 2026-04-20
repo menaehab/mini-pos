@@ -21,9 +21,11 @@ class ProductController extends Controller
                 $query->where('category_id', $category_id);
             })
             ->when($data['search'] ?? null, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-                $query->orWhere('code', 'like', "%{$search}%");
-                $query->orWhere('description', 'like', "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                    $q->orWhere('code', 'like', "%{$search}%");
+                    $q->orWhere('description', 'like', "%{$search}%");
+                });
 
             })
             ->when($data['stock_status'] ?? null, function ($query, $stock_status) {
@@ -117,9 +119,11 @@ class ProductController extends Controller
                 $query->where('category_id', $category_id);
             })
             ->when($data['search'] ?? null, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-                $query->orWhere('code', 'like', "%{$search}%");
-                $query->orWhere('description', 'like', "%{$search}%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                    $q->orWhere('code', 'like', "%{$search}%");
+                    $q->orWhere('description', 'like', "%{$search}%");
+                });
             })
             ->latest()
             ->paginate($data['per_page'] ?? 16)->withQueryString();
