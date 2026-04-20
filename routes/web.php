@@ -180,6 +180,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:manage_sales');
 
     // sale returns
+    Route::get('sale-returns/find-sale/{number}', [SaleReturnController::class, 'findSaleByNumber'])
+        ->name('sale-returns.find-sale')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
     Route::get('sale-returns', [SaleReturnController::class, 'index'])
         ->name('sale-returns.index')
         ->middleware('permission:view_sale_returns|manage_sale_returns');
@@ -207,10 +211,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('sale-returns/{saleReturn}', [SaleReturnController::class, 'destroy'])
         ->name('sale-returns.destroy')
         ->middleware('permission:manage_sale_returns');
-
-        Route::resource('sale-returns', SaleReturnController::class);
-
-        Route::resource('sales-returns', SaleReturnController::class);
 
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])

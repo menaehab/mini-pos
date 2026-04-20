@@ -43,7 +43,7 @@ class SaleReturnService
         [$returnItems, $totalPrice] = $this->prepareReturnItems($sale, $data['items']);
 
         return DB::transaction(function () use ($saleReturn, $data, $totalPrice, $returnItems): SaleReturn {
-            
+
             // 1. تنقيص المخزون القديم قبل التعديل (كأن المرتجع ملغى)
             $this->rollbackStock($saleReturn);
 
@@ -95,15 +95,15 @@ class SaleReturnService
 
         $products = Product::query()->whereIn('id', $productIds)->get()->keyBy('id');
 
-        $salePricesByItemName = [];
-        $purchasePricesByItemName = [];
+        $salePricesByProductId = [];
+        $purchasePricesByProductId = [];
         foreach ($sale->items as $saleItem) {
-            if (! isset($salePricesByItemName[$saleItem->product_name])) {
-                $salePricesByItemName[$saleItem->product_name] = (float) $saleItem->sale_price;
+            if (! isset($salePricesByProductId[$saleItem->product_id])) {
+                $salePricesByProductId[$saleItem->product_id] = (float) $saleItem->sale_price;
             }
 
-            if (! isset($purchasePricesByItemName[$saleItem->product_name])) {
-                $purchasePricesByItemName[$saleItem->product_name] = (float) $saleItem->purchase_price;
+            if (! isset($purchasePricesByProductId[$saleItem->product_id])) {
+                $purchasePricesByProductId[$saleItem->product_id] = (float) $saleItem->purchase_price;
             }
         }
 
@@ -112,9 +112,13 @@ class SaleReturnService
 
         foreach ($items as $item) {
             $product = $products->get((int) $item['product_id']);
+            if (! $product) {
+                continue;
+            }
+
             $quantity = (int) $item['quantity'];
-            $salePrice = (float) ($salePricesByItemName[$product->name] ?? $product->sale_price);
-            $purchasePrice = (float) ($purchasePricesByItemName[$product->name] ?? $product->purchase_price);
+            $salePrice = (float) ($salePricesByProductId[$product->id] ?? $product->sale_price);
+            $purchasePrice = (float) ($purchasePricesByProductId[$product->id] ?? $product->purchase_price);
 
             $returnItems[] = [
                 'product_id' => $product->id,

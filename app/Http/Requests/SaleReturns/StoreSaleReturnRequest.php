@@ -62,8 +62,8 @@ class StoreSaleReturnRequest extends FormRequest
 
                 $sold = [];
                 foreach ($sale->items as $item) {
-                    $sold[$item->product_name] =
-                        ($sold[$item->product_name] ?? 0) + $item->quantity;
+                    $sold[$item->product_id] =
+                        ($sold[$item->product_id] ?? 0) + $item->quantity;
                 }
 
                 $returned = SaleReturnItem::whereIn('product_id', array_keys($requested))
@@ -78,7 +78,7 @@ class StoreSaleReturnRequest extends FormRequest
                         continue;
                     }
 
-                    $soldQty = $sold[$product->name] ?? 0;
+                    $soldQty = $sold[$productId] ?? 0;
 
                     if ($soldQty == 0) {
                         $validator->errors()->add('items', __('keywords.add', ['item' => $product->name]).' '.__('keywords.to_sale_first'));

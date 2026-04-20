@@ -23,7 +23,7 @@ export default function Index({ saleReturns = {}, filters = {} }) {
         }
         const delaySearch = setTimeout(() => {
             router.get(
-                route('sales-returns.index'),
+                route('sale-returns.index'),
                 { search: searchQuery, status: statusFilter },
                 { preserveState: true, preserveScroll: true, replace: true },
             );
@@ -38,7 +38,7 @@ export default function Index({ saleReturns = {}, filters = {} }) {
             accessor: 'sale',
             render: (row) => (
                 <span className="font-bold text-gray-700">
-                    {row.sale?.invoice_number || '—'}
+                    {row.sale?.number || '—'}
                 </span>
             ),
         },
@@ -88,7 +88,6 @@ export default function Index({ saleReturns = {}, filters = {} }) {
                 className="relative mx-auto mb-8 max-w-7xl font-['Cairo']"
                 dir="rtl"
             >
-                
                 <div className="mb-6 flex items-center justify-start">
                     <h1 className="text-2xl font-bold text-gray-800">
                         مرتجع المبيعات
@@ -96,9 +95,7 @@ export default function Index({ saleReturns = {}, filters = {} }) {
                 </div>
 
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                   
                     <div className="mb-6 flex w-full items-center gap-4">
-                        
                         <div className="relative flex-1">
                             <input
                                 type="text"
@@ -113,7 +110,6 @@ export default function Index({ saleReturns = {}, filters = {} }) {
                             />
                         </div>
 
-                    
                         <div className="relative w-48">
                             <select
                                 value={statusFilter}
@@ -132,10 +128,9 @@ export default function Index({ saleReturns = {}, filters = {} }) {
                             />
                         </div>
 
-                       
                         <button
                             onClick={() =>
-                                router.get(route('sales-returns.create'))
+                                router.get(route('sale-returns.create'))
                             }
                             className="whitespace-nowrap rounded-xl bg-black px-10 py-3 text-sm font-bold text-white shadow-md transition-colors hover:bg-gray-800"
                         >
@@ -143,7 +138,6 @@ export default function Index({ saleReturns = {}, filters = {} }) {
                         </button>
                     </div>
 
-                   
                     <Table
                         columns={columns}
                         data={saleReturns?.data || []}
