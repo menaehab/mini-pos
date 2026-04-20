@@ -15,7 +15,7 @@ class SaleService
     {
         return DB::transaction(function () use ($data) {
             $this->validateStock($data['items']);
-
+            $data['total_price'] = 0; // Will be updated after items are synced
             $sale = Sale::create($data);
 
             $this->syncItems($sale, $data['items']);

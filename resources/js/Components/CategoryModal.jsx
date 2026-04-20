@@ -78,7 +78,12 @@ export default function CategoryModal({ isOpen, onClose, category = null }) {
         } else {
             post(route('categories.store'), {
                 preserveScroll: true,
-                onSuccess: () => onClose(),
+                onSuccess: () => {
+                    onClose();
+                    setData({
+                        name: '',
+                    });
+                },
             });
         }
     };

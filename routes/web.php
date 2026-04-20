@@ -3,11 +3,12 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [DashboardController::class, 'index'])->name('home');
 
     // users
     Route::get('users', [UserController::class, 'index'])
@@ -40,6 +41,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:view_suppliers');
 
     // customers
+    Route::get('customers/search', [CustomerController::class, 'search'])
+        ->name('customers.search');
+
     Route::get('customers', [CustomerController::class, 'index'])
         ->name('customers.index')
         ->middleware('permission:view_customers|manage_customers');
@@ -69,6 +73,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:view_categories|manage_categories');
 
     // products
+    Route::get('products/search', [ProductController::class, 'searchProducts'])
+        ->name('products.search');
     Route::get('products', [ProductController::class, 'index'])
         ->name('products.index')
         ->middleware('permission:view_products|manage_products');
@@ -119,9 +125,21 @@ Route::middleware('auth')->group(function () {
         ->name('purchase-returns.index')
         ->middleware('permission:view_purchase_returns|manage_purchase_returns');
 
+    Route::get('purchase-returns/create', [PurchaseReturnController::class, 'create'])
+        ->name('purchase-returns.create')
+        ->middleware('permission:add_purchase_returns|manage_purchase_returns');
+
     Route::post('purchase-returns', [PurchaseReturnController::class, 'store'])
         ->name('purchase-returns.store')
         ->middleware('permission:add_purchase_returns|manage_purchase_returns');
+
+    Route::get('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'show'])
+        ->name('purchase-returns.show')
+        ->middleware('permission:view_purchase_returns|manage_purchase_returns');
+
+    Route::get('purchase-returns/{purchaseReturn}/edit', [PurchaseReturnController::class, 'edit'])
+        ->name('purchase-returns.edit')
+        ->middleware('permission:edit_purchase_returns|manage_purchase_returns');
 
     Route::put('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'update'])
         ->name('purchase-returns.update')
@@ -139,10 +157,6 @@ Route::middleware('auth')->group(function () {
     Route::get('sales', [SaleController::class, 'index'])
         ->name('sales.index')
         ->middleware('permission:view_sales|manage_sales');
-
-    Route::get('sales/create', [SaleController::class, 'create'])
-        ->name('sales.create')
-        ->middleware('permission:add_sales|manage_sales');
 
     Route::post('sales', [SaleController::class, 'store'])
         ->name('sales.store')
@@ -163,6 +177,35 @@ Route::middleware('auth')->group(function () {
     Route::delete('sales/{sale}', [SaleController::class, 'destroy'])
         ->name('sales.destroy')
         ->middleware('permission:manage_sales');
+
+    // sale returns
+    Route::get('sale-returns', [SaleReturnController::class, 'index'])
+        ->name('sale-returns.index')
+        ->middleware('permission:view_sale_returns|manage_sale_returns');
+
+    Route::get('sale-returns/create', [SaleReturnController::class, 'create'])
+        ->name('sale-returns.create')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
+    Route::post('sale-returns', [SaleReturnController::class, 'store'])
+        ->name('sale-returns.store')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
+    Route::get('sale-returns/{saleReturn}', [SaleReturnController::class, 'show'])
+        ->name('sale-returns.show')
+        ->middleware('permission:view_sale_returns|manage_sale_returns');
+
+    Route::get('sale-returns/{saleReturn}/edit', [SaleReturnController::class, 'edit'])
+        ->name('sale-returns.edit')
+        ->middleware('permission:edit_sale_returns|manage_sale_returns');
+
+    Route::put('sale-returns/{saleReturn}', [SaleReturnController::class, 'update'])
+        ->name('sale-returns.update')
+        ->middleware('permission:edit_sale_returns|manage_sale_returns');
+
+    Route::delete('sale-returns/{saleReturn}', [SaleReturnController::class, 'destroy'])
+        ->name('sale-returns.destroy')
+        ->middleware('permission:manage_sale_returns');
 
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])
@@ -197,6 +240,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('customer-payments/{customerPayment}', [CustomerPaymentController::class, 'destroy'])
         ->name('customer-payments.destroy')
         ->middleware('permission:manage_customer_payments');
+
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('permission:view_dashboard');
 
 });
 
