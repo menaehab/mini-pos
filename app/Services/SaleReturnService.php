@@ -19,12 +19,18 @@ class SaleReturnService
             $saleReturn = SaleReturn::create([
                 'total_price' => $totalPrice,
                 'note' => $data['note'] ?? null,
-                'is_refunded' => $data['is_refunded'],
+                'is_refunded' => $data['is_refunded'], // استرداد نقدي
                 'user_id' => $userId,
                 'sale_id' => $data['sale_id'],
             ]);
 
             $saleReturn->items()->createMany($returnItems);
+
+            // ⚠️ الأهم: زيادة المخزون (لأن البضاعة رجعت للمحل)
+            foreach ($returnItems as $item) {
+                Product::where('id', $item['product_id'])
+                    ->increment('stock', $item['quantity']);
+            }
 
             return $saleReturn;
         });
@@ -37,6 +43,10 @@ class SaleReturnService
         [$returnItems, $totalPrice] = $this->prepareReturnItems($sale, $data['items']);
 
         return DB::transaction(function () use ($saleReturn, $data, $totalPrice, $returnItems): SaleReturn {
+            
+            // 1. تنقيص المخزون القديم قبل التعديل (كأن المرتجع ملغى)
+            $this->rollbackStock($saleReturn);
+
             $saleReturn->update([
                 'total_price' => $totalPrice,
                 'note' => $data['note'] ?? null,
@@ -47,8 +57,33 @@ class SaleReturnService
             $saleReturn->items()->delete();
             $saleReturn->items()->createMany($returnItems);
 
+            // 2. زيادة المخزون بالكميات الجديدة
+            foreach ($returnItems as $item) {
+                Product::where('id', $item['product_id'])
+                    ->increment('stock', $item['quantity']);
+            }
+
             return $saleReturn;
         });
+    }
+
+    // ⚠️ دالة الحذف الآمنة للمرتجع
+    public function delete(SaleReturn $saleReturn)
+    {
+        return DB::transaction(function () use ($saleReturn) {
+            $this->rollbackStock($saleReturn); // خصم البضاعة من المخزن تاني
+            $saleReturn->items()->delete();
+            $saleReturn->delete();
+        });
+    }
+
+    // خصم البضاعة من المخزن
+    private function rollbackStock(SaleReturn $saleReturn)
+    {
+        foreach ($saleReturn->items as $item) {
+            Product::where('id', $item->product_id)
+                ->decrement('stock', $item->quantity);
+        }
     }
 
     private function prepareReturnItems(Sale $sale, array $items): array
