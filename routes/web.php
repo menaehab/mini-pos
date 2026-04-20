@@ -53,6 +53,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:view_customers|manage_customers');
 
     // categories
+    Route::get('categories/search', [CategoryController::class, 'searchCategories'])
+        ->name('categories.search');
+
     Route::get('categories', [CategoryController::class, 'index'])
         ->name('categories.index')
         ->middleware('permission:view_categories|manage_categories');
