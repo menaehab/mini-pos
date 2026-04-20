@@ -22,7 +22,7 @@ export default function Index({ returns = {}, filters = {} }) {
         }
         const delaySearch = setTimeout(() => {
             router.get(
-                route('purchases-returns.index'), 
+                route('sales-returns.index'), 
                 { search: searchQuery, status: statusFilter }, 
                 { preserveState: true, preserveScroll: true, replace: true }
             );
@@ -30,13 +30,13 @@ export default function Index({ returns = {}, filters = {} }) {
         return () => clearTimeout(delaySearch);
     }, [searchQuery, statusFilter]);
 
-    // الأعمدة مطابقة للصورة بالظبط مع تعديلها للمشتريات
+    // الأعمدة مطابقة للصورة بالظبط
     const columns = [
-    
+        { header: 'الرقم', accessor: 'return_number' },
         { 
-            header: 'رقم فاتورة الشراء', 
-            accessor: 'purchase',
-            render: (row) => <span className="font-bold text-gray-700">{row.purchase?.invoice_number || '—'}</span> 
+            header: 'رقم فاتورة البيع', 
+            accessor: 'sale',
+            render: (row) => <span className="font-bold text-gray-700">{row.sale?.invoice_number || '—'}</span> 
         },
         { 
             header: 'الإجمالي للمرتجع', 
@@ -70,14 +70,14 @@ export default function Index({ returns = {}, filters = {} }) {
 
     return (
         <>
-            <Head title="مرتجعات المشتريات" />
+            <Head title="مرتجعات المبيعات" />
             
             <div className="relative mx-auto mb-8 max-w-7xl font-['Cairo']" dir="rtl">
                 
                 {/* الهيدر */}
                 <div className="mb-6 flex items-center justify-end">
                     <h1 className="text-2xl font-bold text-gray-800">
-                        مرتجعات المشتريات
+                        المبيعات
                     </h1>
                 </div>
 
@@ -85,9 +85,9 @@ export default function Index({ returns = {}, filters = {} }) {
                     <div className="mb-6 flex w-full items-center justify-between gap-4">
                         
                         {/* زرار الإضافة (أسود زي الصورة) */}
-                        {can('manage_purchases_returns') && (
+                        {can('manage_sales_returns') && (
                             <button 
-                                onClick={() => router.get(route('purchases-returns.create'))} 
+                                onClick={() => router.get(route('sales-returns.create'))} 
                                 className="whitespace-nowrap rounded-xl bg-black px-8 py-3 text-sm font-bold text-white hover:bg-gray-800 transition-colors shadow-md"
                             >
                                 اضافة مرتجع
@@ -131,7 +131,7 @@ export default function Index({ returns = {}, filters = {} }) {
                         columns={columns} 
                         data={returns?.data || []} 
                         pagination={returns}
-                        canView={can('view_purchases_returns')}
+                        canView={can('view_sales_returns')}
                     />
                 </div>
             </div>

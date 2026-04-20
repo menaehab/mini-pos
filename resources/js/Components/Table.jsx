@@ -1,10 +1,11 @@
-import { Edit, Eye, Trash2 } from 'lucide-react';
+import { Banknote, Edit, Eye, Trash2 } from 'lucide-react';
 
 export default function Table({
     columns = [],
     data = [],
     onView,
     onEdit,
+    onPay,
     onDelete,
     canView = true,
     canEdit = true,
@@ -27,9 +28,7 @@ export default function Table({
                             </th>
                         ))}
                         {hasActions && (
-                            <th className="px-6 py-4 text-left font-medium">
-                               
-                            </th>
+                            <th className="px-6 py-4 text-left font-medium"></th>
                         )}
                     </tr>
                 </thead>
@@ -60,6 +59,16 @@ export default function Table({
 
                                 {hasActions && (
                                     <td className="actions-column flex items-center justify-end gap-3 px-6 py-4 text-left">
+                                        {onPay && (
+                                            <button
+                                                onClick={() => onPay(row)}
+                                                className="transition-colors hover:text-blue-600"
+                                                title="السداد"
+                                            >
+                                                <Banknote size={18} />
+                                            </button>
+                                        )}
+
                                         {canView && onView && (
                                             <button
                                                 type="button"
