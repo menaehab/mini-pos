@@ -12,7 +12,7 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        $permissions = [
+        $permissions = ([
             'manage_users',
             'view_users',
             'manage_suppliers',
@@ -38,7 +38,6 @@ class PermissionSeeder extends Seeder
             'delete_sales',
             'add_customer_payments',
             'view_customer_payments',
-            'edit_customer_payments',
             'manage_customer_payments',
             'manage_purchase_returns',
             'add_purchase_returns',
@@ -48,7 +47,11 @@ class PermissionSeeder extends Seeder
             'add_sale_returns',
             'edit_sale_returns',
             'view_sale_returns',
-        ];
+            'manage_expenses',
+            'view_expenses',
+            'add_expenses',
+            'view_dashboard',
+        ]);
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
         }

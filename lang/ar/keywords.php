@@ -94,6 +94,7 @@ return [
     'view_supplier_payments' => 'عرض مدفوعات الموردين',
     'supplier_payment' => 'مدفوعات الموردين',
     'to_purchase_first' => 'لإضافته إلى هذه الشراء',
+    'to_sale_first' => 'لإضافته إلى هذا البيع',
     'return_quantity_exceeds_remaining' => 'كمية الإرجاع للمنتج :item تتجاوز الكمية المتبقية :remaining',
 
     // Product

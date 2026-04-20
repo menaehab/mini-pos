@@ -3,11 +3,12 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerPaymentController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/', [DashboardController::class, 'index'])->name('home');
 
     // users
     Route::get('users', [UserController::class, 'index'])
@@ -165,6 +166,23 @@ Route::middleware('auth')->group(function () {
         ->name('sales.destroy')
         ->middleware('permission:manage_sales');
 
+    // sale returns
+    Route::get('sale-returns', [SaleReturnController::class, 'index'])
+        ->name('sale-returns.index')
+        ->middleware('permission:view_sale_returns|manage_sale_returns');
+
+    Route::post('sale-returns', [SaleReturnController::class, 'store'])
+        ->name('sale-returns.store')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
+    Route::put('sale-returns/{saleReturn}', [SaleReturnController::class, 'update'])
+        ->name('sale-returns.update')
+        ->middleware('permission:edit_sale_returns|manage_sale_returns');
+
+    Route::delete('sale-returns/{saleReturn}', [SaleReturnController::class, 'destroy'])
+        ->name('sale-returns.destroy')
+        ->middleware('permission:manage_sale_returns');
+
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])
         ->name('supplier-payments.index')
@@ -198,6 +216,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('customer-payments/{customerPayment}', [CustomerPaymentController::class, 'destroy'])
         ->name('customer-payments.destroy')
         ->middleware('permission:manage_customer_payments');
+
+    Route::get('dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('permission:view_dashboard');
 
 });
 
