@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Purchases\SearchPurchaseRequest;
 use App\Http\Requests\Purchases\StorePurchaseRequest;
 use App\Http\Requests\Purchases\UpdatePurchaseRequest;
+use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Supplier;
 use App\Services\PurchaseService;
 
 class PurchaseController extends Controller
@@ -14,29 +16,52 @@ class PurchaseController extends Controller
 
     public function index(SearchPurchaseRequest $request)
     {
-        // استقبال الفلاتر بأسماء الفرونت إند
         $search = $request->input('search');
-        $paymentMethod = $request->input('payment_method');
-        $status = $request->input('status'); // لو عندك حالة
+        $paymentType = $request->input('payment_method', $request->input('payment_type'));
+        $status = $request->input('status');
         $date = $request->input('date');
 
-        $purchases = Purchase::with('supplier')
+        $purchases = Purchase::query()
+            ->with('supplier')
+            ->withSum('supplierPayments as paid_amount', 'amount')
             ->when($search, function ($query, $search) {
-                // بحث برقم الفاتورة أو اسم المورد
-                $query->where('invoice_number', 'like', "%$search%")
-                      ->orWhereHas('supplier', function ($q) use ($search) {
-                          $q->where('name', 'like', "%$search%");
-                      });
+                $query->where(function ($nestedQuery) use ($search) {
+                    $nestedQuery->where('number', 'like', "%{$search}%")
+                        ->orWhereHas('supplier', function ($supplierQuery) use ($search) {
+                            $supplierQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
             })
-            ->when($paymentMethod, function ($query, $paymentMethod) {
-                $query->where('payment_method', $paymentMethod);
+            ->when($paymentType, function ($query, $paymentType) {
+                $query->where('payment_type', $paymentType);
             })
             ->when($date, function ($query, $date) {
                 $query->whereDate('created_at', $date);
             })
+            ->when($status === 'paid', function ($query) {
+                $query->havingRaw('COALESCE(paid_amount, 0) >= total_price');
+            })
+            ->when($status === 'unpaid', function ($query) {
+                $query->havingRaw('COALESCE(paid_amount, 0) < total_price');
+            })
             ->latest()
             ->paginate($request->input('per_page', 10))
             ->withQueryString();
+
+        $purchases->getCollection()->transform(function (Purchase $purchase) {
+            $paid = (float) ($purchase->paid_amount ?? 0);
+            $total = (float) $purchase->total_price;
+            $remaining = max($total - $paid, 0);
+
+            $purchase->setAttribute('invoice_number', $purchase->number);
+            $purchase->setAttribute('total', $total);
+            $purchase->setAttribute('paid', $paid);
+            $purchase->setAttribute('remaining', $remaining);
+            $purchase->setAttribute('payment_method', $purchase->payment_type);
+            $purchase->setAttribute('status', $remaining <= 0 ? 'paid' : 'unpaid');
+
+            return $purchase;
+        });
 
         return inertia('Purchases/Index', [
             'purchases' => $purchases,
@@ -46,9 +71,8 @@ class PurchaseController extends Controller
 
     public function create()
     {
-        // هنبعت الموردين والمنتجات للفرونت عشان يختار منها
-        $suppliers = \App\Models\Supplier::select('id', 'name')->get();
-        $products = \App\Models\Product::select('id', 'name', 'stock')->get();
+        $suppliers = Supplier::query()->select('id', 'name')->get();
+        $products = Product::query()->select('id', 'name', 'stock', 'purchase_price', 'sale_price')->get();
 
         return inertia('Purchases/Create', [
             'suppliers' => $suppliers,
@@ -61,8 +85,7 @@ class PurchaseController extends Controller
         $data = $request->validated();
         $data['user_id'] = auth()->id();
 
-        // اتعدلت لـ create بدل createPurchase
-        $purchase = $this->purchaseService->create($data); 
+        $this->purchaseService->create($data);
 
         return redirect()->route('purchases.index')
             ->with('success', __('keywords.created', ['name' => __('keywords.purchase')]));
@@ -70,7 +93,11 @@ class PurchaseController extends Controller
 
     public function show(Purchase $purchase)
     {
-        $purchase->load('supplier', 'items.product', 'firstPayment');
+        $purchase->load('supplier', 'items.product', 'supplierPaymentAllocations.supplierPayment');
+
+        $paidAmount = (float) $purchase->supplierPayments()->sum('amount');
+        $purchase->setAttribute('paid_amount', $paidAmount);
+        $purchase->setAttribute('remaining_amount', max((float) $purchase->total_price - $paidAmount, 0));
 
         return inertia('Purchases/Show', [
             'purchase' => $purchase,
@@ -79,9 +106,18 @@ class PurchaseController extends Controller
 
     public function edit(Purchase $purchase)
     {
-        $purchase->load('supplier', 'items.product');
-        $suppliers = \App\Models\Supplier::select('id', 'name')->get();
-        $products = \App\Models\Product::select('id', 'name', 'stock')->get();
+        $purchase->load('supplier', 'items.product', 'supplierPaymentAllocations.supplierPayment');
+        $suppliers = Supplier::query()->select('id', 'name')->get();
+        $products = Product::query()->select('id', 'name', 'stock', 'purchase_price', 'sale_price')->get();
+
+        $firstPaymentAmount = (float) $purchase->supplierPaymentAllocations()
+            ->where('is_first_payment', true)
+            ->with('supplierPayment:id,amount')
+            ->get()
+            ->sum(fn ($allocation) => (float) ($allocation->supplierPayment?->amount ?? 0));
+
+        $purchase->setAttribute('amount', $firstPaymentAmount);
+        $purchase->setAttribute('payment_note', null);
 
         return inertia('Purchases/Edit', [
             'purchase' => $purchase,
@@ -93,7 +129,7 @@ class PurchaseController extends Controller
     public function update(UpdatePurchaseRequest $request, Purchase $purchase)
     {
         $data = $request->validated();
-        
+
         $this->purchaseService->update($purchase, $data);
 
         return redirect()->route('purchases.index')
@@ -102,7 +138,6 @@ class PurchaseController extends Controller
 
     public function destroy(Purchase $purchase)
     {
-        // استدعاء دالة الحذف الآمنة من السيرفيس عشان نرجع المخزون
         $this->purchaseService->delete($purchase);
 
         return redirect()->route('purchases.index')

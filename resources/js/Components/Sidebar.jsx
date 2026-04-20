@@ -38,7 +38,19 @@ const menuItems = [
         name: 'اذن التوريد',
         icon: `${ICONS_PATH}/streamline_payment-10.svg`,
         route: 'customer-payments.index',
-        requiredPermissions: ['view_customer_payments', 'manage_customer_payments'],
+        requiredPermissions: [
+            'view_customer_payments',
+            'manage_customer_payments',
+        ],
+    },
+    {
+        name: 'اذن الصرف',
+        icon: `${ICONS_PATH}/streamline_payment-10.svg`,
+        route: 'supplier-payments.index',
+        requiredPermissions: [
+            'view_supplier_payments',
+            'manage_supplier_payments',
+        ],
     },
     {
         name: 'المبيعات',
@@ -124,7 +136,7 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
                 </svg>
             </button>
 
-            <nav className="mt-6 flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-1 py-6">
+            <nav className="flex-1 px-1 py-6 mt-6 space-y-1 overflow-x-hidden overflow-y-auto">
                 {visibleMenuItems.map((item) => (
                     <Link
                         key={item.name}
