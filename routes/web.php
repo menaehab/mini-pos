@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierPaymentController;
 use App\Http\Controllers\UserController;
@@ -163,6 +164,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('sales/{sale}', [SaleController::class, 'destroy'])
         ->name('sales.destroy')
         ->middleware('permission:manage_sales');
+
+    // sale returns
+    Route::get('sale-returns', [SaleReturnController::class, 'index'])
+        ->name('sale-returns.index')
+        ->middleware('permission:view_sale_returns|manage_sale_returns');
+
+    Route::post('sale-returns', [SaleReturnController::class, 'store'])
+        ->name('sale-returns.store')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
+    Route::put('sale-returns/{saleReturn}', [SaleReturnController::class, 'update'])
+        ->name('sale-returns.update')
+        ->middleware('permission:edit_sale_returns|manage_sale_returns');
+
+    Route::delete('sale-returns/{saleReturn}', [SaleReturnController::class, 'destroy'])
+        ->name('sale-returns.destroy')
+        ->middleware('permission:manage_sale_returns');
 
     // supplier payments
     Route::get('supplier-payments', [SupplierPaymentController::class, 'index'])

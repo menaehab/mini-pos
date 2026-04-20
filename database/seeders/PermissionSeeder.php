@@ -51,6 +51,9 @@ class PermissionSeeder extends Seeder
             'edit_sale_returns',
             'view_sale_returns',
             'manage_customer_payments',
+            'manage_expenses',
+            'view_expenses',
+            'add_expenses',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);

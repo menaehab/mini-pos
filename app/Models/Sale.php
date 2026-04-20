@@ -32,4 +32,9 @@ class Sale extends Model
     {
         return $this->hasMany(CustomerPaymentAllocation::class);
     }
+
+    public function returns()
+    {
+        return $this->hasMany(SaleReturn::class);
+    }
 }
