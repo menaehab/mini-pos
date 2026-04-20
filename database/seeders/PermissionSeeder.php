@@ -31,14 +31,12 @@ class PermissionSeeder extends Seeder
             'view_supplier_payments',
             'add_supplier_payments',
             'edit_supplier_payments',
-            'manage_supplier_payments',
             'manage_sales',
             'view_sales',
             'add_sales',
             'edit_sales',
             'delete_sales',
             'add_customer_payments',
-            'edit_customer_payments',
             'view_customer_payments',
             'edit_customer_payments',
             'manage_customer_payments',
@@ -50,7 +48,6 @@ class PermissionSeeder extends Seeder
             'add_sale_returns',
             'edit_sale_returns',
             'view_sale_returns',
-            'manage_customer_payments',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);

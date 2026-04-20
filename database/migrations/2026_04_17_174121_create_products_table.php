@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->decimal('purchase_price', 10, 2)->default(0);
             $table->decimal('sale_price', 10, 2)->default(0);
+            $table->integer('stock')->default(0);
+            $table->integer('min_stock')->default(0);
             $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
             $table->timestamps();
         });

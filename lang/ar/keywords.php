@@ -98,4 +98,16 @@ return [
     'required' => 'مطلوب',
     'cash' => 'كاش',
     'installment' => 'قسط',
+
+    // POS 
+    'pos' => 'نقاط البيع',
+    'show_all' => 'عرض الكل',
+    'search_pos' => 'بحث نقطة البيع ....',
+    'current_invoice' => 'الفاتورة الحالية',
+    'items_count' => 'عدد الأصناف',
+    'subtotal' => 'اجمالي قبل الضريبة',
+    'invoice_total' => 'اجمالي الفاتورة',
+    'amount_due' => 'المطلوب سداده',
+    'pay' => 'سدد',
+    'currency' => 'ج.م',
 ];

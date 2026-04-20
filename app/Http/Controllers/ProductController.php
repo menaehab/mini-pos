@@ -16,7 +16,7 @@ class ProductController extends Controller
     {
         $data = $request->validated();
 
-        $products = Product::query()
+        $products = Product::query()->with('category')
             ->when($data['category_id'] ?? null, function ($query, $category_id) {
                 $query->where('category_id', $category_id);
             })
