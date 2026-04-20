@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable([
     'supplier_payment_id',
     'purchase_id',
+    'is_first_payment',
 ])]
 class SupplierPaymentAllocation extends Model
 {

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Purchases;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use App\Enums\PurchaseTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePurchaseRequest extends FormRequest
@@ -18,17 +18,19 @@ class UpdatePurchaseRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array<mixed>|string>
+    * @return array<string, array<int, string>|string>
      */
     public function rules(): array
     {
         return [
             'supplier_id' => ['required', 'exists:suppliers,id'],
+            'payment_type' => ['required', 'in:'.implode(',', PurchaseTypeEnum::values())],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.item_name' => ['required', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.purchase_price' => ['required', 'numeric', 'min:0'],
+            'items.*.sale_price' => ['required', 'numeric', 'min:0'],
             'note' => ['nullable', 'string', 'max:255'],
             'payment_note' => ['nullable', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0'],

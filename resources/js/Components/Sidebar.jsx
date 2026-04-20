@@ -1,4 +1,4 @@
-﻿import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -38,29 +38,41 @@ const menuItems = [
         name: 'اذن التوريد',
         icon: `${ICONS_PATH}/ion_receipt-outline.svg`,
         route: 'customer-payments.index',
-        requiredPermissions: ['view_customer_payments', 'manage_customer_payments'],
+        requiredPermissions: [
+            'view_customer_payments',
+            'manage_customer_payments',
+        ],
+    },
+    {
+        name: 'اذن الصرف',
+        icon: `${ICONS_PATH}/streamline_payment-10.svg`,
+        route: 'supplier-payments.index',
+        requiredPermissions: [
+            'view_supplier_payments',
+            'manage_supplier_payments',
+        ],
     },
     {
         name: 'المبيعات',
-        icon: '/Solve X/icon-park-outline_sales-report.svg',
+        icon: `${ICONS_PATH}/icon-park-outline_sales-report.svg`,
         route: 'sales.index',
         requiredPermissions: ['view_sales', 'manage_sales'],
     },
     {
         name: 'مرتجع المبيعات',
-        icon: '/Solve X/lsicon_sales-return-outline.svg',
+        icon: `${ICONS_PATH}/lsicon_sales-return-outline.svg`,
         route: 'sale-returns.index',
         requiredPermissions: ['view_sales', 'manage_sales'],
     },
     {
         name: 'المشتريات',
-        icon: '/Solve X/tdesign_money.svg',
+        icon: `${ICONS_PATH}/tdesign_money.svg`,
         route: 'purchases.index',
         requiredPermissions: ['view_purchases', 'manage_purchases'],
     },
     {
         name: 'الأحصائيات',
-        icon: '/Solve X/uil_statistics.svg',
+        icon: `${ICONS_PATH}/uil_statistics.svg`,
         route: 'dashboard',
         requiredPermissions: ['view_dashboard'],
     },
@@ -80,7 +92,10 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
 
     const isRouteActive = (routeName) => {
         try {
-            return route().current(routeName) || route().current(`${routeName.split('.')[0]}.*`);
+            return (
+                route().current(routeName) ||
+                route().current(`${routeName.split('.')[0]}.*`)
+            );
         } catch {
             return false;
         }
@@ -91,9 +106,7 @@ export default function Sidebar({ isOpen, onClose = () => {} }) {
     };
 
     const visibleMenuItems = menuItems.filter((item) => {
-        if (!item.requiredPermissions) {
-            return true;
-        }
+        if (!item.requiredPermissions) return true;
         return canAny(item.requiredPermissions);
     });
 

@@ -180,6 +180,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:manage_sales');
 
     // sale returns
+    Route::get('sale-returns/find-sale/{number}', [SaleReturnController::class, 'findSaleByNumber'])
+        ->name('sale-returns.find-sale')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
     Route::get('sale-returns', [SaleReturnController::class, 'index'])
         ->name('sale-returns.index')
         ->middleware('permission:view_sale_returns|manage_sale_returns');
