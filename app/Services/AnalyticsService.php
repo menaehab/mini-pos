@@ -136,6 +136,7 @@ class AnalyticsService
         });
 
         return [
+            'purchases_count' => $purchases->count(),
             'total_purchases' => (float) $totalPurchases,
             'total_paid' => (float) $totalPaid,
             'total_unpaid' => (float) ($totalPurchases - $totalPaid),
@@ -146,13 +147,24 @@ class AnalyticsService
 
     private function getChartsData(CarbonImmutable $start, CarbonImmutable $end): array
     {
+        $performanceLast7Days = $this->getLast7DaysPerformance();
+
         return [
-            'sales_last_7_days' => $this->getLast7DaysSales(),
+            'performance_last_7_days' => $performanceLast7Days,
+            // Keep legacy key for any old consumers.
+            'sales_last_7_days' => array_map(
+                fn (array $day) => [
+                    'date' => $day['date'],
+                    'label' => $day['label'],
+                    'total' => $day['sales'],
+                ],
+                $performanceLast7Days,
+            ),
             'top_products' => $this->getTopSellingProducts($start, $end),
         ];
     }
 
-    private function getLast7DaysSales(): array
+    private function getLast7DaysPerformance(): array
     {
         $start = CarbonImmutable::today()->subDays(6)->startOfDay();
         $end = CarbonImmutable::today()->endOfDay();
@@ -162,13 +174,20 @@ class AnalyticsService
             ->groupBy('sale_date')
             ->pluck('total', 'sale_date');
 
-        return collect(range(0, 6))->map(function (int $i) use ($start, $salesByDate) {
+        $purchasesByDate = Purchase::whereBetween('created_at', [$start, $end])
+            ->selectRaw('DATE(created_at) AS purchase_date, SUM(total_price) AS total')
+            ->groupBy('purchase_date')
+            ->pluck('total', 'purchase_date');
+
+        return collect(range(0, 6))->map(function (int $i) use ($start, $salesByDate, $purchasesByDate) {
             $date = $start->addDays($i);
+            $dateKey = $date->toDateString();
 
             return [
-                'date' => $date->toDateString(),
+                'date' => $dateKey,
                 'label' => $date->isoFormat('ddd'),
-                'total' => (float) ($salesByDate[$date->toDateString()] ?? 0),
+                'sales' => (float) ($salesByDate[$dateKey] ?? 0),
+                'purchases' => (float) ($purchasesByDate[$dateKey] ?? 0),
             ];
         })->all();
     }
