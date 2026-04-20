@@ -27,7 +27,7 @@ const FormInput = ({
     </div>
 );
 
-export default function CustomerModal({ isOpen, onClose, customer = null }) {
+export default function CustomerModal({ isOpen, onClose, customer = null, redirectBack = false }) {
     const isEditing = !!customer;
 
     const {
@@ -80,7 +80,7 @@ export default function CustomerModal({ isOpen, onClose, customer = null }) {
                 onSuccess: () => onClose(),
             });
         } else {
-            post(route('customers.store'), {
+            post(route('customers.store', { redirect_back: redirectBack }), {
                 preserveScroll: true,
                 onSuccess: () => onClose(),
             });

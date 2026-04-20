@@ -41,6 +41,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:view_suppliers');
 
     // customers
+    Route::get('customers/search', [CustomerController::class, 'search'])
+        ->name('customers.search');
+
     Route::get('customers', [CustomerController::class, 'index'])
         ->name('customers.index')
         ->middleware('permission:view_customers|manage_customers');
@@ -70,6 +73,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:view_categories|manage_categories');
 
     // products
+    Route::get('products/search', [ProductController::class, 'searchProducts'])
+        ->name('products.search');
     Route::get('products', [ProductController::class, 'index'])
         ->name('products.index')
         ->middleware('permission:view_products|manage_products');
@@ -140,10 +145,6 @@ Route::middleware('auth')->group(function () {
     Route::get('sales', [SaleController::class, 'index'])
         ->name('sales.index')
         ->middleware('permission:view_sales|manage_sales');
-
-    Route::get('sales/create', [SaleController::class, 'create'])
-        ->name('sales.create')
-        ->middleware('permission:add_sales|manage_sales');
 
     Route::post('sales', [SaleController::class, 'store'])
         ->name('sales.store')

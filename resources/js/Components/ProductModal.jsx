@@ -1,6 +1,7 @@
 import useTranslation from '@/hooks/useTranslation';
 import { useForm } from '@inertiajs/react';
-import { ChevronDown, Search, X } from 'lucide-react';
+import axios from 'axios';
+import { ChevronDown, Loader2, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const FormInput = ({
@@ -52,18 +53,17 @@ const FormTextarea = ({
     </div>
 );
 
-export default function ProductModal({
-    isOpen,
-    onClose,
-    product = null,
-    categories = [],
-}) {
+export default function ProductModal({ isOpen, onClose, product = null }) {
     const { __ } = useTranslation();
     const isEditing = !!product;
 
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const [categorySearch, setCategorySearch] = useState('');
     const dropdownRef = useRef(null);
+
+    const [apiCategories, setApiCategories] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [selectedCategoryName, setSelectedCategoryName] = useState('');
 
     const {
         data,
@@ -76,12 +76,13 @@ export default function ProductModal({
         clearErrors,
         setError,
     } = useForm({
+        code: '',
         name: '',
         category_id: '',
         purchase_price: '',
         sale_price: '',
-        quantity: '',
-        min_quantity: '',
+        stock: '',
+        min_stock: '',
         description: '',
     });
 
@@ -92,19 +93,50 @@ export default function ProductModal({
             setIsSelectOpen(false);
             if (isEditing) {
                 setData({
+                    code: product.code || '',
                     name: product.name || '',
+                    stock: product.stock || 0,
+                    min_stock: product.min_stock || 0,
                     category_id: product.category_id || '',
                     purchase_price: product.purchase_price || '',
                     sale_price: product.sale_price || '',
-                    quantity: product.quantity || '',
-                    min_quantity: product.min_quantity || '',
                     description: product.description || '',
                 });
+
+                setSelectedCategoryName(product.category?.name || '');
             } else {
                 reset();
+                setSelectedCategoryName('');
             }
         }
     }, [isOpen, product]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const fetchCategories = async () => {
+            setIsSearching(true);
+            try {
+                const response = await axios.get(route('categories.search'), {
+                    params: { search: categorySearch },
+                });
+
+                const fetchedData =
+                    response.data.data?.data || response.data.data || [];
+                setApiCategories(fetchedData);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            } finally {
+                setIsSearching(false);
+            }
+        };
+
+        const delayDebounceFn = setTimeout(() => {
+            fetchCategories();
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [categorySearch, isOpen]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -150,11 +182,6 @@ export default function ProductModal({
         }
     };
 
-    const filteredCategories = categories.filter((c) =>
-        c.name.toLowerCase().includes(categorySearch.toLowerCase()),
-    );
-    const selectedCategory = categories.find((c) => c.id === data.category_id);
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity">
             <div
@@ -175,7 +202,37 @@ export default function ProductModal({
                 </h2>
 
                 <form onSubmit={handleSubmit}>
+                    {Object.keys(errors).length > 0 && (
+                        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+                            <strong className="mb-1 block">
+                                الباك إند رفض الإضافة للأسباب دي:
+                            </strong>
+                            <ul className="list-disc pr-5">
+                                {Object.entries(errors).map(
+                                    ([field, message]) => (
+                                        <li
+                                            key={field}
+                                            className="font-semibold"
+                                        >
+                                            <span className="ml-1 text-gray-700">
+                                                {field}:
+                                            </span>
+                                            {message}
+                                        </li>
+                                    ),
+                                )}
+                            </ul>
+                        </div>
+                    )}
                     <div className="grid grid-cols-1 gap-x-6 lg:grid-cols-2">
+                        <FormInput
+                            label={__('keywords.product_code') || 'كود المنتج'}
+                            placeholder="اتركه فارغاً ليتم توليده تلقائياً"
+                            required={false}
+                            value={data.code}
+                            onChange={(e) => setData('code', e.target.value)}
+                            error={errors.code}
+                        />
                         <FormInput
                             label={__('keywords.name')}
                             placeholder="اسم المنتج"
@@ -199,14 +256,12 @@ export default function ProductModal({
                             >
                                 <span
                                     className={
-                                        selectedCategory
+                                        selectedCategoryName
                                             ? 'text-gray-900'
                                             : 'text-gray-400'
                                     }
                                 >
-                                    {selectedCategory
-                                        ? selectedCategory.name
-                                        : 'اختر القسم'}
+                                    {selectedCategoryName || 'اختر القسم'}
                                 </span>
                                 <ChevronDown
                                     size={16}
@@ -214,7 +269,6 @@ export default function ProductModal({
                                 />
                             </div>
 
-                          
                             {isSelectOpen && (
                                 <div className="absolute z-10 mt-1 flex max-h-48 w-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
                                     <div className="flex items-center gap-2 border-b border-gray-100 p-2">
@@ -233,16 +287,26 @@ export default function ProductModal({
                                             }
                                             className="w-full bg-transparent text-sm outline-none"
                                         />
+
+                                        {isSearching && (
+                                            <Loader2
+                                                size={14}
+                                                className="animate-spin text-gray-400"
+                                            />
+                                        )}
                                     </div>
                                     <div className="overflow-y-auto">
-                                        {filteredCategories.length > 0 ? (
-                                            filteredCategories.map((cat) => (
+                                        {apiCategories.length > 0 ? (
+                                            apiCategories.map((cat) => (
                                                 <div
                                                     key={cat.id}
                                                     onClick={() => {
                                                         setData(
                                                             'category_id',
                                                             cat.id,
+                                                        );
+                                                        setSelectedCategoryName(
+                                                            cat.name,
                                                         );
                                                         setIsSelectOpen(false);
                                                     }}
@@ -253,7 +317,9 @@ export default function ProductModal({
                                             ))
                                         ) : (
                                             <div className="px-4 py-3 text-center text-sm text-gray-500">
-                                                لا توجد أقسام
+                                                {isSearching
+                                                    ? 'جاري البحث...'
+                                                    : 'لا توجد أقسام'}
                                             </div>
                                         )}
                                     </div>
@@ -291,21 +357,19 @@ export default function ProductModal({
                             label={__('keywords.quantity')}
                             placeholder="الكمية المتاحة"
                             type="number"
-                            value={data.quantity}
-                            onChange={(e) =>
-                                setData('quantity', e.target.value)
-                            }
-                            error={errors.quantity}
+                            value={data.stock}
+                            onChange={(e) => setData('stock', e.target.value)}
+                            error={errors.stock}
                         />
                         <FormInput
                             label={__('keywords.min_quantity')}
                             placeholder="تنبيه النواقص"
                             type="number"
-                            value={data.min_quantity}
+                            value={data.min_stock}
                             onChange={(e) =>
-                                setData('min_quantity', e.target.value)
+                                setData('min_stock', e.target.value)
                             }
-                            error={errors.min_quantity}
+                            error={errors.min_stock}
                         />
 
                         <FormTextarea
@@ -330,7 +394,6 @@ export default function ProductModal({
                         <button
                             type="submit"
                             disabled={processing}
-                    
                             className="min-w-[130px] whitespace-nowrap rounded-full bg-black px-6 py-2.5 text-sm font-bold text-white shadow-md transition-colors hover:bg-gray-800 disabled:opacity-50"
                         >
                             {processing

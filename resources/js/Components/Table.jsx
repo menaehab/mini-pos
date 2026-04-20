@@ -28,7 +28,7 @@ export default function Table({
                         ))}
                         {hasActions && (
                             <th className="px-6 py-4 text-left font-medium">
-                                الإجراءات
+                               
                             </th>
                         )}
                     </tr>

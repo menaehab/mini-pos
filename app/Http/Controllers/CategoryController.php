@@ -7,6 +7,7 @@ use App\Http\Requests\Categories\StoreCategoryRequest;
 use App\Http\Requests\Categories\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -57,21 +58,22 @@ class CategoryController extends Controller
             ->with('success', __('keywords.deleted', ['name' => __('keywords.category')]));
     }
 
-    public function searchCategories(SearchCategoryRequest $request): JsonResponse
-    {
-        $data = $request->validated();
+    public function searchCategories(Request $request): JsonResponse
+{
+    $search = $request->input('search');
 
-        $categories = Category::when($data['search'] ?? null, function ($query) use ($data) {
-            $query->where('name', 'like', "%{$data['search']}%");
-        })
-            ->orderBy('name')
-            ->limit($data['per_page'] ?? 10)
-            ->withQueryString();
+    $categories = Category::when($search, function ($query) use ($search) {
+        $query->where('name', 'like', "%{$search}%");
+    })
+    ->select('id', 'name') 
+    ->orderBy('name')
+    ->limit(20) 
+    ->get(); 
 
-        return response()->json([
-            'data' => $categories,
-        ]);
-    }
+    return response()->json([
+        'data' => $categories,
+    ]);
+}
 
     public function storeCategory(StoreCategoryRequest $request)
     {

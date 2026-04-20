@@ -37,7 +37,6 @@ class PermissionSeeder extends Seeder
             'edit_sales',
             'delete_sales',
             'add_customer_payments',
-            'edit_customer_payments',
             'view_customer_payments',
             'manage_customer_payments',
             'manage_purchase_returns',

@@ -24,7 +24,7 @@ class SearchProductRequest extends FormRequest
     {
         return [
             'search' => 'nullable|string|max:255',
-            'per_page' => 'nullable|integer|in:10,25,50,100',
+            'per_page' => 'nullable|integer',
             'category_id' => 'nullable|exists:categories,id',
             'stock_status' => 'nullable|in:in_stock,out_of_stock,low_stock',
         ];

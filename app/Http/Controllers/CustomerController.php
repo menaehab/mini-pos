@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Categories\StoreCategoryRequest;
 use App\Http\Requests\Customers\SearchCustomerRequest;
+use App\Http\Requests\Customers\StoreCustomerRequest;
 use App\Http\Requests\Customers\UpdateCustomerRequest;
 use App\Models\Customer;
 
@@ -36,7 +36,7 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategoryRequest $request)
+    public function store(StoreCustomerRequest $request)
     {
         $data = $request->validated();
         $customer = Customer::create([
@@ -45,6 +45,11 @@ class CustomerController extends Controller
             'address' => $data['address'] ?? null,
             'national_number' => $data['national_number'] ?? null,
         ]);
+
+        if ($request->has('redirect_back')) {
+            return back()->with('success', __('keywords.created', ['name' => __('keywords.customer')]))
+                ->with('new_customer', $customer);
+        }
 
         return redirect()->route('customers.index')->with('success', __('keywords.created', ['name' => __('keywords.customer')]));
     }
@@ -78,5 +83,22 @@ class CustomerController extends Controller
         $customer->delete();
 
         return redirect()->route('customers.index')->with('success', __('keywords.deleted', ['name' => __('keywords.customer')]));
+    }
+
+    public function search(SearchCustomerRequest $request)
+    {
+        $data = $request->validated();
+
+        $customers = Customer::query()
+            ->when($data['search'] ?? null, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+                $query->orWhere('phone', 'like', "%{$search}%");
+                $query->orWhere('national_number', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return response()->json($customers);
     }
 }
