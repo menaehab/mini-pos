@@ -30,9 +30,9 @@ export default function Index({ returns = {}, filters = {} }) {
         return () => clearTimeout(delaySearch);
     }, [searchQuery, statusFilter]);
 
-    // الأعمدة مطابقة للصورة بالظبط
+
     const columns = [
-        { header: 'الرقم', accessor: 'return_number' },
+       
         { 
             header: 'رقم فاتورة البيع', 
             accessor: 'sale',
@@ -74,7 +74,6 @@ export default function Index({ returns = {}, filters = {} }) {
             
             <div className="relative mx-auto mb-8 max-w-7xl font-['Cairo']" dir="rtl">
                 
-                {/* الهيدر */}
                 <div className="mb-6 flex items-center justify-end">
                     <h1 className="text-2xl font-bold text-gray-800">
                         المبيعات
@@ -84,7 +83,6 @@ export default function Index({ returns = {}, filters = {} }) {
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div className="mb-6 flex w-full items-center justify-between gap-4">
                         
-                        {/* زرار الإضافة (أسود زي الصورة) */}
                         {can('manage_sales_returns') && (
                             <button 
                                 onClick={() => router.get(route('sales-returns.create'))} 
@@ -94,10 +92,8 @@ export default function Index({ returns = {}, filters = {} }) {
                             </button>
                         )}
 
-                        {/* الفلاتر والبحث */}
                         <div className="flex items-center gap-4 flex-1 justify-end">
                             
-                            {/* فلتر الحالات */}
                             <div className="relative w-48">
                                 <select
                                     value={statusFilter}
@@ -112,7 +108,7 @@ export default function Index({ returns = {}, filters = {} }) {
                                 <ChevronDown className="absolute left-4 top-3.5 text-gray-400" size={16} />
                             </div>
 
-                            {/* شريط البحث */}
+                        
                             <div className="relative w-80">
                                 <input
                                     type="text"

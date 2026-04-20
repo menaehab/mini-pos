@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MainLayout from '@/Layouts/MainLayout';
 import Table from '@/Components/Table';
-import DeleteConfirmModal from '@/Components/DeleteConfirmModal';
-import { Search, RotateCcw } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { Head, router } from '@inertiajs/react';
 import useTranslation from '@/hooks/useTranslation';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -12,11 +11,7 @@ export default function Index({ returns = {}, filters = {} }) {
     const { can } = usePermissions();
     
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
-    const [perPage, setPerPage] = useState(filters.per_page || '10');
-    
-    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [returnToDelete, setReturnToDelete] = useState(null);
-    const [deleteProcessing, setDeleteProcessing] = useState(false);
+    const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
     const isFirstRender = useRef(true);
 
@@ -27,84 +22,43 @@ export default function Index({ returns = {}, filters = {} }) {
         }
         const delaySearch = setTimeout(() => {
             router.get(
-                route('purchases-returns.index'), // تأكد إن ده اسم الراوت بتاعك
-                { search: searchQuery, per_page: perPage }, 
+                route('purchases-returns.index'), 
+                { search: searchQuery, status: statusFilter }, 
                 { preserveState: true, preserveScroll: true, replace: true }
             );
         }, 400);
         return () => clearTimeout(delaySearch);
-    }, [searchQuery, perPage]);
+    }, [searchQuery, statusFilter]);
 
-    const handleDelete = (item) => {
-        setReturnToDelete(item);
-        setDeleteModalOpen(true);
-    };
-
-    const confirmDelete = () => {
-        setDeleteProcessing(true);
-        router.delete(route('purchases-returns.destroy', returnToDelete.id), {
-            preserveScroll: true,
-            onSuccess: () => {
-                setDeleteModalOpen(false);
-                setReturnToDelete(null);
-                setDeleteProcessing(false);
-            },
-            onError: () => setDeleteProcessing(false),
-        });
-    };
-
-    const handleEdit = (item) => {
-        router.get(route('purchases-returns.edit', item.id));
-    };
-
-    const handleView = (item) => {
-        router.get(route('purchases-returns.show', item.id));
-    };
-
-    // تعريف الأعمدة لجدول مرتجعات المشتريات
+    // الأعمدة مطابقة للصورة بالظبط مع تعديلها للمشتريات
     const columns = [
-        { header: __('keywords.return_number') || 'رقم المرتجع', accessor: 'return_number' },
+    
         { 
-            header: __('keywords.original_purchase_invoice') || 'رقم فاتورة الشراء', 
+            header: 'رقم فاتورة الشراء', 
             accessor: 'purchase',
-            render: (row) => <span className="font-bold text-gray-600">{row.purchase?.invoice_number || '—'}</span> 
+            render: (row) => <span className="font-bold text-gray-700">{row.purchase?.invoice_number || '—'}</span> 
         },
         { 
-            header: __('keywords.supplier') || 'المورد', 
-            accessor: 'supplier',
-            render: (row) => <span className="font-bold text-gray-800">{row.supplier?.name || __('keywords.cash_supplier')}</span> 
-        },
-        { 
-            header: __('keywords.total_returned') || 'إجمالي المرتجع', 
+            header: 'الإجمالي للمرتجع', 
             accessor: 'total_returned',
-            // خليناها هنا باللون الأخضر لأن دي فلوس راجعة لينا أو ديون بتسقط من علينا
-            render: (row) => <span className="font-bold text-green-600">{row.total_returned || 0} ج.م</span>
+            render: (row) => <span className="font-bold text-gray-900">{row.total_returned || 0} ج.م</span>
         },
         { 
-            header: __('keywords.status') || 'الحالة', 
-            accessor: 'status',
-            render: (row) => {
-                let badgeClass = "bg-gray-100 text-gray-700 border-gray-200";
-                let statusText = row.status;
-
-                // حالات المرتجع (مكتمل أو قيد الانتظار)
-                if (row.status === 'completed') {
-                    badgeClass = "bg-green-100 text-green-700 border-green-200";
-                    statusText = __('keywords.completed_status') || 'مكتمل';
-                } else if (row.status === 'pending') {
-                    badgeClass = "bg-yellow-100 text-yellow-700 border-yellow-200";
-                    statusText = __('keywords.pending_status') || 'قيد الانتظار';
-                }
-
-                return (
-                    <span className={`px-3 py-1 rounded-full border text-xs font-bold ${badgeClass}`}>
-                        {statusText}
-                    </span>
-                );
-            }
+            header: 'استرداد نقدي', 
+            accessor: 'cash_refund',
+            render: (row) => (
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${row.cash_refund ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                    {row.cash_refund ? 'نعم' : 'لا'}
+                </span>
+            )
         },
         { 
-            header: __('keywords.return_date') || 'تاريخ المرتجع', 
+            header: 'المستخدم', 
+            accessor: 'user',
+            render: (row) => row.user?.name || '—'
+        },
+        { 
+            header: 'تاريخ الإنشاء', 
             accessor: 'created_at',
             render: (row) => (
                 <span dir="ltr" className="text-sm text-gray-600">
@@ -116,81 +70,71 @@ export default function Index({ returns = {}, filters = {} }) {
 
     return (
         <>
-            <Head title={__('keywords.purchases_returns') || 'مرتجعات المشتريات'} />
+            <Head title="مرتجعات المشتريات" />
             
             <div className="relative mx-auto mb-8 max-w-7xl font-['Cairo']" dir="rtl">
-                <div className="mb-8 flex items-center justify-between">
+                
+                {/* الهيدر */}
+                <div className="mb-6 flex items-center justify-end">
                     <h1 className="text-2xl font-bold text-gray-800">
-                        {__('keywords.purchases_returns') || 'مرتجعات المشتريات'}
+                        مرتجعات المشتريات
                     </h1>
                 </div>
 
-                <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
                     <div className="mb-6 flex w-full items-center justify-between gap-4">
                         
-                        <div className="flex items-center gap-4">
-                            <div className="relative w-72">
-                                <input
-                                    type="text"
-                                    placeholder={__('keywords.search') || 'بحث...'}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full rounded-lg border border-gray-200 py-2 pr-10 pl-4 text-right focus:border-black focus:outline-none"
-                                />
-                                <Search className="absolute right-3 top-2.5 text-gray-400" size={18} />
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500">{__('keywords.show') || 'عرض'}</span>
-                                <select
-                                    value={perPage}
-                                    onChange={(e) => setPerPage(e.target.value)}
-                                    className="cursor-pointer appearance-none rounded-lg border border-gray-200 bg-none px-2 py-2 text-center focus:border-black focus:outline-none"
-                                    dir="ltr"
-                                >
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div>
-                        </div>
-
+                        {/* زرار الإضافة (أسود زي الصورة) */}
                         {can('manage_purchases_returns') && (
                             <button 
                                 onClick={() => router.get(route('purchases-returns.create'))} 
-                                className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-red-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-red-700 min-w-[130px] transition-colors shadow-md"
+                                className="whitespace-nowrap rounded-xl bg-black px-8 py-3 text-sm font-bold text-white hover:bg-gray-800 transition-colors shadow-md"
                             >
-                                <RotateCcw size={16} />
-                                {__('keywords.add_purchase_return') || 'إضافة مرتجع مشتريات'}
+                                اضافة مرتجع
                             </button>
                         )}
+
+                        {/* الفلاتر والبحث */}
+                        <div className="flex items-center gap-4 flex-1 justify-end">
+                            
+                            {/* فلتر الحالات */}
+                            <div className="relative w-48">
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="w-full appearance-none rounded-xl border border-gray-200 py-3 pl-10 pr-4 text-right text-sm text-gray-600 focus:border-black focus:outline-none bg-transparent cursor-pointer"
+                                    dir="rtl"
+                                >
+                                    <option value="">كل الحالات</option>
+                                    <option value="completed">مكتمل</option>
+                                    <option value="pending">قيد الانتظار</option>
+                                </select>
+                                <ChevronDown className="absolute left-4 top-3.5 text-gray-400" size={16} />
+                            </div>
+
+                            {/* شريط البحث */}
+                            <div className="relative w-80">
+                                <input
+                                    type="text"
+                                    placeholder="بحث"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full rounded-xl border border-gray-200 py-3 pl-4 pr-10 text-right focus:border-black focus:outline-none text-sm"
+                                />
+                                <Search className="absolute right-3 top-3 text-gray-400" size={18} />
+                            </div>
+
+                        </div>
                     </div>
 
                     <Table 
                         columns={columns} 
                         data={returns?.data || []} 
                         pagination={returns}
-                        onView={handleView} 
-                        onEdit={handleEdit} 
-                        onDelete={handleDelete} 
                         canView={can('view_purchases_returns')}
-                        canEdit={can('manage_purchases_returns')}
-                        canDelete={can('manage_purchases_returns')}
                     />
                 </div>
             </div>
-
-            <DeleteConfirmModal
-                isOpen={deleteModalOpen}
-                onClose={() => {
-                    setDeleteModalOpen(false);
-                    setReturnToDelete(null);
-                }}
-                onConfirm={confirmDelete}
-                userName={returnToDelete?.return_number}
-                entityName={__('keywords.return_number') || 'رقم المرتجع'}
-                processing={deleteProcessing}
-            />
         </>
     );
 }

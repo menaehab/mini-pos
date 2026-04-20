@@ -7,17 +7,17 @@ export default function Create() {
     
 
     const [invoiceProducts, setInvoiceProducts] = useState([
-        { id: 1, name: 'قطن', price: 120, max_qty: 10 },
-        { id: 2, name: 'قماش حرير', price: 300, max_qty: 5 },
+        { id: 1, name: 'قطن', price: 100, max_qty: 50 }, 
+        { id: 2, name: 'قماش حرير', price: 250, max_qty: 20 },
     ]);
 
     const { data, setData, post, processing, errors } = useForm({
         invoice_number: '',
         reason: '',
         cash_refund: true,
+  
         items: invoiceProducts.map(p => ({ ...p, return_qty: 0, selected: false }))
     });
-
 
     const calculateTotals = () => {
         let count = 0;
@@ -33,23 +33,20 @@ export default function Create() {
 
     const { count: selectedCount, total: returnTotal } = calculateTotals();
 
-
     const handleQtyChange = (id, newQty) => {
         setData('items', data.items.map(item => {
             if (item.id === id) {
-                const validQty = Math.min(Math.max(0, newQty), item.max_qty); 
+                const validQty = Math.min(Math.max(0, newQty), item.max_qty);
                 return { ...item, return_qty: validQty, selected: validQty > 0 };
             }
             return item;
         }));
     };
 
-
     const toggleSelect = (id) => {
         setData('items', data.items.map(item => {
             if (item.id === id) {
                 const newSelected = !item.selected;
-                
                 return { ...item, selected: newSelected, return_qty: newSelected ? 1 : 0 };
             }
             return item;
@@ -58,25 +55,24 @@ export default function Create() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         const payload = {
             ...data,
             items: data.items.filter(item => item.selected && item.return_qty > 0)
         };
         console.log("Data to send:", payload);
-
+        post(route('purchases-returns.store'), payload);
     };
 
     return (
         <>
-            <Head title="انشاء مرتجع" />
+            <Head title="انشاء مرتجع مشتريات" />
             
             <div className="relative mx-auto mb-8 max-w-5xl font-['Cairo']" dir="rtl">
                 
-
+                
                 <div className="mb-6 flex items-center gap-3 text-2xl font-bold">
-                    <Link href={route('sales-returns.index')} className="text-gray-500 hover:text-gray-800 transition-colors">
-                        مرتجع المبيعات
+                    <Link href={route('purchases-returns.index')} className="text-gray-500 hover:text-gray-800 transition-colors">
+                        مرتجع المشتريات
                     </Link>
                     <ChevronLeft size={22} className="text-gray-400 mt-1" strokeWidth={2.5} />
                     <span className="text-gray-900">انشاء مرتجع</span>
@@ -84,10 +80,10 @@ export default function Create() {
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                     
-                   
+                    
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            رقم فاتورة البيع <span className="text-red-500">*</span>
+                            رقم فاتورة الشراء <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                             <input
@@ -101,7 +97,6 @@ export default function Create() {
                         </div>
                     </div>
 
-                   
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-100">
                             <h3 className="text-sm font-semibold text-gray-500">حدد المنتجات التي تريد ارجاعها و ادخل الكميه لكل منتج</h3>
@@ -111,7 +106,7 @@ export default function Create() {
                                 <thead className="bg-gray-50 text-gray-500">
                                     <tr>
                                         <th className="px-6 py-3 font-semibold w-1/3">المنتج</th>
-                                        <th className="px-6 py-3 font-semibold">سعر البيع</th>
+                                        <th className="px-6 py-3 font-semibold">سعر الشراء</th> {/* تم التعديل */}
                                         <th className="px-6 py-3 font-semibold">الكمية المتاحة</th>
                                         <th className="px-6 py-3 font-semibold w-40 text-center">كمية الارجاع</th>
                                     </tr>
@@ -153,7 +148,7 @@ export default function Create() {
                         </div>
                     </div>
 
-                    
+                 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                         <div className="px-6 py-4 border-b border-gray-100">
                             <h3 className="font-bold text-gray-800">تفاصيل المرتجع</h3>

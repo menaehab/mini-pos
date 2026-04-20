@@ -2,13 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-use Illuminate\Database\Eloquent\Model;
-
-class SaleReturn extends Model
-{
-    //
-=======
 use App\Observers\SaleReturnObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
@@ -39,5 +32,4 @@ class SaleReturn extends Model
     {
         return $this->belongsTo(User::class);
     }
->>>>>>> main
 }
