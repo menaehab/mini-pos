@@ -15,7 +15,7 @@ class CustomerPaymentController extends Controller
     public function index(SeachCustomerPaymentRequest $request)
     {
         $data = $request->validated();
-        $payments = CustomerPayment::with('customer', 'allocations.sale');
+        $payments = CustomerPayment::with('customer', 'allocations.sale', 'user');
 
         if ($data['search'] ?? false) {
             $payments->where(function ($q) use ($data) {

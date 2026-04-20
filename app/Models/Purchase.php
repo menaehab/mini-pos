@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
     'total_price',
     'supplier_name',
     'payment_type',
+    'note',
     'user_id',
     'supplier_id',
 ])]
