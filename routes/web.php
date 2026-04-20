@@ -125,9 +125,21 @@ Route::middleware('auth')->group(function () {
         ->name('purchase-returns.index')
         ->middleware('permission:view_purchase_returns|manage_purchase_returns');
 
+    Route::get('purchase-returns/create', [PurchaseReturnController::class, 'create'])
+        ->name('purchase-returns.create')
+        ->middleware('permission:add_purchase_returns|manage_purchase_returns');
+
     Route::post('purchase-returns', [PurchaseReturnController::class, 'store'])
         ->name('purchase-returns.store')
         ->middleware('permission:add_purchase_returns|manage_purchase_returns');
+
+    Route::get('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'show'])
+        ->name('purchase-returns.show')
+        ->middleware('permission:view_purchase_returns|manage_purchase_returns');
+
+    Route::get('purchase-returns/{purchaseReturn}/edit', [PurchaseReturnController::class, 'edit'])
+        ->name('purchase-returns.edit')
+        ->middleware('permission:edit_purchase_returns|manage_purchase_returns');
 
     Route::put('purchase-returns/{purchaseReturn}', [PurchaseReturnController::class, 'update'])
         ->name('purchase-returns.update')
@@ -171,9 +183,21 @@ Route::middleware('auth')->group(function () {
         ->name('sale-returns.index')
         ->middleware('permission:view_sale_returns|manage_sale_returns');
 
+    Route::get('sale-returns/create', [SaleReturnController::class, 'create'])
+        ->name('sale-returns.create')
+        ->middleware('permission:add_sale_returns|manage_sale_returns');
+
     Route::post('sale-returns', [SaleReturnController::class, 'store'])
         ->name('sale-returns.store')
         ->middleware('permission:add_sale_returns|manage_sale_returns');
+
+    Route::get('sale-returns/{saleReturn}', [SaleReturnController::class, 'show'])
+        ->name('sale-returns.show')
+        ->middleware('permission:view_sale_returns|manage_sale_returns');
+
+    Route::get('sale-returns/{saleReturn}/edit', [SaleReturnController::class, 'edit'])
+        ->name('sale-returns.edit')
+        ->middleware('permission:edit_sale_returns|manage_sale_returns');
 
     Route::put('sale-returns/{saleReturn}', [SaleReturnController::class, 'update'])
         ->name('sale-returns.update')
