@@ -1,139 +1,243 @@
-import React, { useState } from 'react';
+import CartItem from '@/Components/Pos/CartItem';
+import CheckoutModal from '@/Components/Pos/CheckoutModal';
+import ProductCard from '@/Components/Pos/ProductCard';
+import useTranslation from '@/hooks/useTranslation';
 import MainLayout from '@/Layouts/MainLayout';
 import { Head } from '@inertiajs/react';
-import { Search } from 'lucide-react';
-import useTranslation from '@/hooks/useTranslation'; 
+import axios from 'axios';
+import { Search, ShoppingBag } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-export default function Home() {
-    const { __ } = useTranslation(); 
-    
-    const showAllText = __('keywords.show_all');
+export default function Home({ categories, products: initialProducts }) {
+    const { __ } = useTranslation();
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeCategory, setActiveCategory] = useState(showAllText);
-    const [cart, setCart] = useState([]); 
-    
-   const categories = [showAllText, 'قطن', 'قماش', 'زراير'];
-    const dummyProducts = [
-        { id: 1, name: 'قطن مصري ممتاز', category: 'قطن', price: 150 },
-        { id: 2, name: 'قماش حرير', category: 'قماش', price: 300 },
-        { id: 3, name: 'زراير بلاستيك', category: 'زراير', price: 50 },
-        { id: 4, name: 'قطن طبي', category: 'قطن', price: 100 },
-        { id: 5, name: 'قماش كتان', category: 'قماش', price: 200 },
-    ];
-    
-    const filteredProducts = dummyProducts.filter(product => {
-        const matchesCategory = activeCategory === showAllText || product.category === activeCategory;
-        const matchesSearch = product.name.includes(searchQuery);
-        return matchesCategory && matchesSearch;
-    });
+    const [activeCategory, setActiveCategory] = useState('all');
+    const [products, setProducts] = useState(initialProducts);
+    const [cart, setCart] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+    // Fetch products when category or search changes
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setIsLoading(true);
+            try {
+                const response = await axios.get(route('products.search'), {
+                    params: {
+                        search: searchQuery,
+                        category_id:
+                            activeCategory === 'all' ? null : activeCategory,
+                        per_page: 16,
+                    },
+                });
+                setProducts(response.data.data);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const timeoutId = setTimeout(() => {
+            fetchProducts();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchQuery, activeCategory]);
+
+    const addToCart = (product) => {
+        setCart((prev) => {
+            const existing = prev.find((item) => item.id === product.id);
+            if (existing) {
+                if (existing.quantity >= product.stock) return prev;
+                return prev.map((item) =>
+                    item.id === product.id
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item,
+                );
+            }
+            return [...prev, { ...product, quantity: 1 }];
+        });
+    };
+
+    const updateQuantity = (id, quantity) => {
+        if (quantity <= 0) {
+            removeFromCart(id);
+            return;
+        }
+        setCart((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
+        );
+    };
+
+    const removeFromCart = (id) => {
+        setCart((prev) => prev.filter((item) => item.id !== id));
+    };
+
+    const subtotal = cart.reduce(
+        (sum, item) => sum + item.sale_price * item.quantity,
+        0,
+    );
 
     return (
         <>
             <Head title={__('keywords.pos')} />
-            
-            <div className="relative mx-auto max-w-7xl font-['Cairo'] h-[calc(100vh-100px)] flex flex-col" dir="rtl">
-                
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-800">{__('keywords.pos')}</h1>
-                </div>
-                
-                <div className="flex flex-col lg:flex-row gap-6 flex-1 overflow-hidden">
-               
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                        
-                
-                        <div className="relative mb-6">
+
+            <div
+                className="relative mx-auto flex h-[calc(100vh-100px)] max-w-full flex-col gap-6 overflow-hidden p-4 font-['Cairo'] lg:flex-row"
+                dir="rtl"
+            >
+                {/* Main Content: Products */}
+                <div className="flex flex-1 flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm">
+                    {/* Header: Search & Filter */}
+                    <div className="mb-6 flex flex-col gap-4">
+                        {/* Search */}
+                        <div className="relative w-full">
                             <input
                                 type="text"
-                                placeholder={__('keywords.search_pos')}
+                                placeholder={__('keywords.search_products')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-xl border border-gray-200 py-3 pl-4 pr-12 text-right focus:border-black focus:outline-none focus:ring-1 focus:ring-black shadow-sm"
+                                className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-4 pl-4 pr-12 text-right transition-all focus:border-black focus:ring-1 focus:ring-black"
                             />
-                            <Search className="absolute right-4 top-3.5 text-gray-400" size={20} />
+                            <Search
+                                className="absolute right-4 top-4 text-gray-400"
+                                size={20}
+                            />
                         </div>
 
-                
-                        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+                        {/* Filters */}
+                        <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-2">
+                            <button
+                                onClick={() => setActiveCategory('all')}
+                                className={`whitespace-nowrap rounded-2xl px-6 py-3.5 text-sm font-bold transition-all ${
+                                    activeCategory === 'all'
+                                        ? 'scale-105 bg-black text-white shadow-xl'
+                                        : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                                }`}
+                            >
+                                {__('keywords.all_categories')}
+                            </button>
+
                             {categories.map((cat) => (
                                 <button
-                                    key={cat}
-                                    onClick={() => setActiveCategory(cat)}
-                                    className={`px-6 py-1.5 rounded-full text-sm font-bold transition-colors whitespace-nowrap ${
-                                        activeCategory === cat 
-                                        ? 'bg-black text-white shadow-md' 
-                                        : 'bg-transparent text-gray-600 hover:bg-gray-100'
+                                    key={cat.id}
+                                    onClick={() => setActiveCategory(cat.id)}
+                                    className={`whitespace-nowrap rounded-2xl px-6 py-3.5 text-sm font-bold transition-all ${
+                                        activeCategory === cat.id
+                                            ? 'scale-105 bg-black text-white shadow-xl'
+                                            : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                                     }`}
                                 >
-                                    {cat}
+                                    {cat.name}
                                 </button>
                             ))}
                         </div>
+                    </div>
 
-                  
-                        <div className="flex-1 overflow-y-auto pr-1">
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4">
-                                {filteredProducts.map((product) => (
-                                    <div 
+                    {/* Products Grid */}
+                    <div className="custom-scrollbar flex-1 overflow-y-auto pr-1">
+                        {isLoading ? (
+                            <div className="flex h-full items-center justify-center">
+                                <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-black border-r-transparent" />
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="flex h-full flex-col items-center justify-center text-gray-400 opacity-60">
+                                <ShoppingBag
+                                    size={64}
+                                    strokeWidth={1}
+                                    className="mb-4"
+                                />
+                                <span className="text-xl font-bold">
+                                    {__('keywords.no_products_found')}
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-4 pb-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
+                                {products.map((product) => (
+                                    <ProductCard
                                         key={product.id}
-                                        onClick={() => console.log('اضافة للسلة:', product.name)}
-                                        className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:shadow-md hover:border-gray-200 transition-all h-32"
-                                    >
-                                        <span className="font-bold text-gray-800 mb-2">{product.name}</span>
-                                        <span className="text-sm text-gray-500">{product.price} {__('keywords.currency')}</span>
-                                    </div>
+                                        product={product}
+                                        onAddToCart={addToCart}
+                                    />
                                 ))}
                             </div>
-                        </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Sidebar: Cart */}
+                <div className="flex h-full w-full flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-lg lg:w-[400px]">
+                    <div className="flex items-center justify-between border-b border-gray-50 p-6">
+                        <h2 className="text-xl font-black text-gray-800">
+                            {__('keywords.shopping_cart')}
+                        </h2>
+                        <span className="rounded-full bg-black px-3 py-1 text-[10px] font-black text-white">
+                            {cart.length} {__('keywords.items')}
+                        </span>
                     </div>
 
-                   
-                    <div className="w-full lg:w-[350px] bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col overflow-hidden h-full">
-                        
-                   
-                        <div className="p-4 border-b border-gray-100">
-                            <h2 className="font-bold text-gray-800">{__('keywords.current_invoice')}</h2>
-                        </div>
-
-                  
-                        <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center bg-gray-50/30">
-                            {cart.length === 0 ? (
-                                <p className="text-gray-400 font-semibold text-sm">{__('keywords.items_count')} (0)</p>
-                            ) : (
-                                <div className="w-full h-full">
-                  
-                                </div>
-                            )}
-                        </div>
-
-                  
-                        <div className="bg-gray-50 border-t border-gray-200 p-4 flex flex-col gap-3">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-500 font-semibold">{__('keywords.subtotal')}</span>
-                                <span className="text-gray-400 font-bold">0.00 {__('keywords.currency')}</span>
+                    <div className="custom-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto bg-gray-50/30 p-4">
+                        {cart.length === 0 ? (
+                            <div className="flex h-full flex-col items-center justify-center text-center text-gray-400 opacity-40">
+                                <ShoppingBag size={48} className="mb-2" />
+                                <p className="text-sm font-bold">
+                                    {__('keywords.cart_is_empty')}
+                                </p>
                             </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-800 font-bold">{__('keywords.invoice_total')}</span>
-                                <span className="text-gray-800 font-bold">0.00 {__('keywords.currency')}</span>
-                            </div>
-                            
-                            <hr className="border-gray-200 my-1" />
-                            
-                            <div className="flex justify-between items-center text-md mb-2">
-                                <span className="text-gray-800 font-bold">{__('keywords.amount_due')}</span>
-                                <span className="text-gray-800 font-bold">0.00 {__('keywords.currency')}</span>
-                            </div>
-
-                            <button className="w-full bg-black text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors shadow-md">
-                                {__('keywords.pay')}
-                            </button>
-                        </div>
-
+                        ) : (
+                            cart.map((item) => (
+                                <CartItem
+                                    key={item.id}
+                                    item={item}
+                                    onUpdateQuantity={updateQuantity}
+                                    onRemove={removeFromCart}
+                                />
+                            ))
+                        )}
                     </div>
 
+                    {/* Footer: Totals */}
+                    <div className="flex flex-col gap-4 bg-white p-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="font-bold text-gray-400">
+                                    {__('keywords.subtotal')}
+                                </span>
+                                <span className="font-black text-gray-600">
+                                    {subtotal.toFixed(2)}{' '}
+                                    {__('keywords.currency')}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between border-t border-gray-50 pt-2">
+                                <span className="text-lg font-black text-gray-800">
+                                    {__('keywords.total')}
+                                </span>
+                                <span className="text-2xl font-black text-black">
+                                    {subtotal.toFixed(2)}{' '}
+                                    {__('keywords.currency')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setIsCheckoutOpen(true)}
+                            disabled={cart.length === 0}
+                            className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-black py-5 font-black text-white shadow-xl transition-all hover:bg-gray-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 disabled:grayscale"
+                        >
+                            <span>{__('keywords.checkout')}</span>
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <CheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
+                cart={cart}
+                total={subtotal}
+            />
         </>
     );
 }

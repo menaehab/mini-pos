@@ -38,6 +38,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+                'new_customer' => $request->session()->get('new_customer'),
             ],
             'user_permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? [],
             'translations' => function () {

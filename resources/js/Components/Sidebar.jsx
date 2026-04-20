@@ -18,7 +18,7 @@ const menuItems = [
     },
     {
         name: 'المنتجات',
-        icon: `${ICONS_PATH}/qlementine-icons_items-list-16.svg`,
+        icon: `${ICONS_PATH}/fluent-mdl2_sections.svg`,
         route: 'products.index',
         requiredPermissions: ['view_products', 'manage_products'],
     },

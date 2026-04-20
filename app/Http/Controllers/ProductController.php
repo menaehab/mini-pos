@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Categories\UpdateCategoryRequest;
 use App\Http\Requests\Products\SearchProductRequest;
 use App\Http\Requests\Products\StoreProductRequest;
+use App\Http\Requests\Products\UpdateProductRequest;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -89,7 +89,7 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoryRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
         $data = $request->validated();
 
@@ -106,5 +106,24 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('products.index')->with('success', __('keywords.deleted', ['name' => __('keywords.product')]));
+    }
+
+    public function searchProducts(SearchProductRequest $request)
+    {
+        $data = $request->validated();
+
+        $products = Product::query()->with('category')
+            ->when($data['category_id'] ?? null, function ($query, $category_id) {
+                $query->where('category_id', $category_id);
+            })
+            ->when($data['search'] ?? null, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+                $query->orWhere('code', 'like', "%{$search}%");
+                $query->orWhere('description', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate($data['per_page'] ?? 16)->withQueryString();
+
+        return $products;
     }
 }

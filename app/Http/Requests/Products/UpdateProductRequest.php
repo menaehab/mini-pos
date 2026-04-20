@@ -27,6 +27,8 @@ class UpdateProductRequest extends FormRequest
             'code' => 'nullable|string|max:255|unique:products,code,'.$this->route('product')->id,
             'description' => 'nullable|string|max:1000',
             'purchase_price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'min_stock' => 'required|integer|min:0',
             'sale_price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
         ];
