@@ -91,7 +91,7 @@ export default function Home({ categories, products: initialProducts }) {
                 {/* Main Content: Products */}
                 <div className="flex flex-1 flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm">
                     {/* Header: Search & Filter */}
-                    <div className="mb-6 flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 mb-6">
                         {/* Search */}
                         <div className="relative w-full">
                             <input
@@ -99,16 +99,16 @@ export default function Home({ categories, products: initialProducts }) {
                                 placeholder={__('keywords.search_products')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-2xl border-gray-100 bg-gray-50/50 py-4 pl-4 pr-12 text-right transition-all focus:border-black focus:ring-1 focus:ring-black"
+                                className="w-full py-4 pl-4 pr-12 text-right transition-all border-gray-100 rounded-2xl bg-gray-50/50 focus:border-black focus:ring-1 focus:ring-black"
                             />
                             <Search
-                                className="absolute right-4 top-4 text-gray-400"
+                                className="absolute text-gray-400 right-4 top-4"
                                 size={20}
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="scrollbar-hide flex items-center gap-2 overflow-x-auto pb-2">
+                        <div className="flex items-center gap-2 pb-2 overflow-x-auto scrollbar-hide">
                             <button
                                 onClick={() => setActiveCategory('all')}
                                 className={`whitespace-nowrap rounded-2xl px-6 py-3.5 text-sm font-bold transition-all ${
@@ -137,13 +137,13 @@ export default function Home({ categories, products: initialProducts }) {
                     </div>
 
                     {/* Products Grid */}
-                    <div className="custom-scrollbar flex-1 overflow-y-auto pr-1">
+                    <div className="flex-1 pr-1 overflow-y-auto custom-scrollbar">
                         {isLoading ? (
-                            <div className="flex h-full items-center justify-center">
-                                <div className="h-12 w-12 animate-spin rounded-full border-4 border-solid border-black border-r-transparent" />
+                            <div className="flex items-center justify-center h-full">
+                                <div className="w-12 h-12 border-4 border-black border-solid rounded-full animate-spin border-r-transparent" />
                             </div>
                         ) : products.length === 0 ? (
-                            <div className="flex h-full flex-col items-center justify-center text-gray-400 opacity-60">
+                            <div className="flex flex-col items-center justify-center h-full text-gray-400 opacity-60">
                                 <ShoppingBag
                                     size={64}
                                     strokeWidth={1}
@@ -169,7 +169,7 @@ export default function Home({ categories, products: initialProducts }) {
 
                 {/* Sidebar: Cart */}
                 <div className="flex h-full w-full flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-lg lg:w-[400px]">
-                    <div className="flex items-center justify-between border-b border-gray-50 p-6">
+                    <div className="flex items-center justify-between p-6 border-b border-gray-50">
                         <h2 className="text-xl font-black text-gray-800">
                             {__('keywords.shopping_cart')}
                         </h2>
@@ -178,9 +178,9 @@ export default function Home({ categories, products: initialProducts }) {
                         </span>
                     </div>
 
-                    <div className="custom-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto bg-gray-50/30 p-4">
+                    <div className="flex flex-col flex-1 gap-3 p-4 overflow-y-auto custom-scrollbar bg-gray-50/30">
                         {cart.length === 0 ? (
-                            <div className="flex h-full flex-col items-center justify-center text-center text-gray-400 opacity-40">
+                            <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 opacity-40">
                                 <ShoppingBag size={48} className="mb-2" />
                                 <p className="text-sm font-bold">
                                     {__('keywords.cart_is_empty')}
@@ -210,7 +210,7 @@ export default function Home({ categories, products: initialProducts }) {
                                     {__('keywords.currency')}
                                 </span>
                             </div>
-                            <div className="flex items-center justify-between border-t border-gray-50 pt-2">
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-50">
                                 <span className="text-lg font-black text-gray-800">
                                     {__('keywords.total')}
                                 </span>
@@ -224,7 +224,7 @@ export default function Home({ categories, products: initialProducts }) {
                         <button
                             onClick={() => setIsCheckoutOpen(true)}
                             disabled={cart.length === 0}
-                            className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-black py-5 font-black text-white shadow-xl transition-all hover:bg-gray-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 disabled:grayscale"
+                            className="flex items-center justify-center w-full gap-3 py-5 font-black text-white transition-all bg-black shadow-xl group rounded-2xl hover:bg-gray-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 disabled:grayscale"
                         >
                             <span>{__('keywords.checkout')}</span>
                         </button>
